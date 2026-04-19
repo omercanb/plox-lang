@@ -1,0 +1,9 @@
+<button hx-trigger="sse:done from:#streaming-output-container"
+        hx-get="{{ url_for("market.run_button") }}"
+        hx-target="#running-button"
+        hx-swap="outerHTML"
+        disabled
+        type="button"
+        class="btn btn-warning"
+        id="running-button">Running...</button>
+<!-- hx-trigger="sse:done from:body" -->

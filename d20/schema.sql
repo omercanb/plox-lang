@@ -13,6 +13,7 @@ drop table if exists MarketParticipantInventory;
 drop table if exists Orders;
 drop table if exists MarketHistory;
 drop table if exists TradingScript;
+drop table if exists Counter;
 
 -- CREATE TABLE post (
 --   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -186,6 +187,14 @@ create table TradingScript(
     id integer primary key,
     name text not null,
     code text not null,
+    owner_id integer not null,
+    foreign key (owner_id) references MarketPariticipant(id)
+);
+
+create table Counter(
+    id integer primary key,
+    counter_id integer not null,
+    count_idx integer not null,
     owner_id integer not null,
     foreign key (owner_id) references MarketPariticipant(id)
 );
