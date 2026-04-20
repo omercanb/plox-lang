@@ -1,8 +1,8 @@
 <button hx-trigger="click"
-        hx-get="{{ url_for("market.running_button") }}"
-        hx-target="#run-button"
-        hx-swap="outerHTML"
+        hx-get="{{ url_for("market.running_container") }}"
+        hx-vals='{"counter_id":{{ counter_id }}}'
+        hx-target="#sse-container"
+        hx-swap="innerHTML"
         type="button"
         class="btn btn-primary"
-        id="run-button"
-        onclick="runScript()">Run</button>
+        id="run-button">Run</button>

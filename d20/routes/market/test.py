@@ -31,8 +31,9 @@ def test_stream(counter_id):
         yield "event: done\ndata:\n\n"
 
     resp = flask.Response(stream(), mimetype="text/event-stream")
-    resp.headers["Cache-Control"] = "no-cache"
-    resp.headers["X-Accel-Buffering"] = "no"
+    # We may need these later if deploying
+    # resp.headers["Cache-Control"] = "no-cache"
+    # resp.headers["X-Accel-Buffering"] = "no"
     return resp
 
 
@@ -45,7 +46,8 @@ def running_button():
 @bp.route("/test/run_button")
 @market_login_required
 def run_button():
-    return render_template("market/htmx/_run_button.html")
+    counter_id = request.args.get("counter_id")
+    return render_template("market/htmx/_run_button.html", counter_id=counter_id)
 
 
 @bp.route("/test/running_container")
