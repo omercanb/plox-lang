@@ -9,7 +9,7 @@
         onclick="runScript()">Running</button>
 <div id="streaming-output-container"
      sse-swap="output"
-     sse-conenct="{{ url_for('market.test_stream', counter_id=counter_id) }}"
+     sse-connect="{{ url_for('market.test_stream', counter_id=counter_id) }}"
      sse-close="done"
      hx-swap="beforeend"
      class="border rounded p-3"
