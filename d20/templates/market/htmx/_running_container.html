@@ -1,10 +1,13 @@
-<div id="sse-container"
-     sse-swap="output"
-     sse-connect="{{ url_for('market.test_stream', counter_id=counter_id) }}"
-     sse-close="done"
-     hx-swap="beforeend"
-     hx-target="#streaming-output-container">
-    {% include "/market/htmx/_running_button.html" %}
+<div id="sse-container">
+    <div id="sse-connection"
+         sse-swap="output"
+         sse-connect="{{ url_for('market.test_stream', counter_id=counter_id) }}"
+         sse-close="done"
+         hx-swap="beforeend"
+         hx-target="#streaming-output-container">
+        {% include "/market/htmx/_running_button.html" %}
+        {% include "/market/htmx/_stop_button.html" %}
+    </div>
     <div id="streaming-output-container"
          class="border rounded p-3"
          style="background-color: #f5f5f5;
@@ -12,7 +15,6 @@
                 max-height: 400px;
                 font-family: monospace;
                 white-space: pre-wrap;
-                word-wrap: break-word">
-        <p class="text-muted" id="text-box">Click run to hopefully stream output...</p>
-    </div>
+                word-wrap: break-word"></div>
+</div>
 </div>

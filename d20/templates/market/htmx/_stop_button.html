@@ -1,0 +1,8 @@
+<button hx-trigger="click"
+        hx-get="{{ url_for("market.run_button") }}"
+        hx-vals='{"counter_id":{{ counter_id }}}'
+        hx-target="#sse-connection"
+        hx-swap="outerHTML"
+        type="button"
+        class="btn btn-danger"
+        id="run-button">Stop</button>

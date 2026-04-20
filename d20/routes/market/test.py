@@ -1,7 +1,9 @@
+import html
 from time import sleep
 
 import flask
 from flask import g, render_template, request
+from jinja2.utils import htmlsafe_json_dumps
 
 from d20.db.market.test import get_counts, increment_count
 
@@ -20,15 +22,24 @@ def test(counter_id):
 @bp.route("/test/<int:counter_id>/stream")
 @market_login_required
 def test_stream(counter_id):
-    lines = ["YO was good", "my gang", "i hope the day is good"]
+    lines = [
+        "YO was good<div> code code code </div>",
+        "my gang",
+        "i hope the day is good",
+    ]
 
     def stream():
-        for line in lines:
-            sleep(0.5)
-            print(f"event: output\ndata: {line}\n\n")
-            yield f"event: output\ndata: {line}\n\n"
-        print("event: done\ndata:\n\n")
-        yield "event: done\ndata:\n\n"
+        try:
+            for line in lines * 100:
+                sleep(0.5)
+                # Without the html escape you can embed divs
+                safe = html.escape(line).replace("\n", "<br>")
+                yield f"event: output\ndata: {safe}<br>\n\n"
+            print("event: done\ndata:\n\n")
+            yield "event: done\ndata:\n\n"
+        except GeneratorExit as e:
+            print("Safely exiting")
+            print(e)
 
     resp = flask.Response(stream(), mimetype="text/event-stream")
     # We may need these later if deploying
