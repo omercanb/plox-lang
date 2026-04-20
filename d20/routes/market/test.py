@@ -1,7 +1,7 @@
 from time import sleep
 
 import flask
-from flask import g, render_template
+from flask import g, render_template, request
 
 from d20.db.market.test import get_counts, increment_count
 
@@ -46,3 +46,10 @@ def running_button():
 @market_login_required
 def run_button():
     return render_template("market/htmx/_run_button.html")
+
+
+@bp.route("/test/running_container")
+@market_login_required
+def running_container():
+    counter_id = request.args.get("counter_id")
+    return render_template("market/htmx/_running_container.html", counter_id=counter_id)
