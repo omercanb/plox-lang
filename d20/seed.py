@@ -38,9 +38,9 @@ def seed_stores():
 
 def seed_games():
     games = [
-        ("Freakopoly", "FRKPOL"),
-        ("Secret Freak", "SCRTFRK"),
-        ("Freaknames", "FRKNMS"),
+        ("Monopoly", "MNPLY"),
+        ("Codenames", "CDNMS"),
+        ("Catan", "CATAN"),
     ]
     return [create_game(name, symbol) for name, symbol in games]
 
