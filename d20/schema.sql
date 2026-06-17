@@ -1,8 +1,5 @@
 drop table if exists User;
-drop table if exists Owner;
-drop table if exists Customer;
 drop table if exists Game;
-drop table if exists GameCopy;
 drop table if exists MarketPariticipant;
 drop table if exists MarketParticipantInventory;
 drop table if exists Orders;
@@ -10,37 +7,16 @@ drop table if exists MarketHistory;
 drop table if exists TradingScript;
 drop table if exists Counter;
 
--- CREATE TABLE post (
---   id INTEGER PRIMARY KEY AUTOINCREMENT,
---   author_id INTEGER NOT NULL,
---   created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
---   title TEXT NOT NULL,
---   body TEXT NOT NULL,
---   FOREIGN KEY (author_id) REFERENCES user (id)
--- );
---
-
 create table User (
     id       integer primary key autoincrement,
     username      text not null unique,
-    -- password is the password hash actually
     password text not null
-    -- created_at    timestamp default current_timestamp
 );
 
 create table Game (
     id integer primary key autoincrement,
     name text not null unique,
     symbol text not null unique
-);
-
-create table GameCopy (
-    game_id integer not null,
-    store_id integer not null,
-    copy_num integer not null,
-    foreign key (game_id) references Game(id),
-    foreign key (store_id) references Store(id),
-    primary key (game_id, store_id, copy_num)
 );
 
 
