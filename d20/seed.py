@@ -21,21 +21,6 @@ def seed_users():
     return [create_user(username, password) for username, password in users]
 
 
-def seed_stores():
-    stores = [
-        ("store1", "Big Boy Playhouse", "pass"),
-        ("store2", "The Dawg Pen", "pass"),
-        ("store3", "The Den", "pass"),
-    ]
-    store_ids = [
-        create_store(username, name, password) for username, name, password in stores
-    ]
-    for store_id in store_ids:
-        for _ in range(3):
-            create_table(store_id, 5)
-    return store_ids
-
-
 def seed_games():
     games = [
         ("Monopoly", "MNPLY"),
@@ -43,23 +28,6 @@ def seed_games():
         ("Catan", "CATAN"),
     ]
     return [create_game(name, symbol) for name, symbol in games]
-
-
-def seed_game_copies(store_ids, game_ids):
-    store_to_game_copy = {}
-    for store_id in store_ids:
-        store_to_game_copy[store_id] = []
-        for game_id in game_ids:
-            copy_num = create_game_copy(game_id, store_id)
-            store_to_game_copy[store_id].append((game_id, copy_num))
-    return store_to_game_copy
-
-
-def seed_session(user_ids, store_ids, store_to_game_copy):
-    user1 = user_ids[0]
-    store1 = store_ids[0]
-    games_used = [copy_num for game_id, copy_num in store_to_game_copy[store1][:1]]
-    create_session(user1, store1, 1, str(date.today()), 10, 15, games_used)
 
 
 def seed_orders(user_ids, game_ids):
@@ -81,10 +49,7 @@ def seed_orders(user_ids, game_ids):
 
 def seed_the_universe():
     user_ids = seed_users()
-    store_ids = seed_stores()
     game_ids = seed_games()
-    store_to_game_copy = seed_game_copies(store_ids, game_ids)
-    seed_session(user_ids, store_ids, store_to_game_copy)
     seed_orders(user_ids, game_ids)
 
 
