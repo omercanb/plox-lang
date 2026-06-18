@@ -4,7 +4,6 @@ drop table if exists MarketPariticipant;
 drop table if exists MarketParticipantInventory;
 drop table if exists Orders;
 drop table if exists MarketHistory;
-drop table if exists TradingScript;
 drop table if exists Counter;
 
 create table User (
@@ -71,8 +70,7 @@ create table Orders (
     filled_quantity integer not null,
     status text check (status in ('OPEN', 'PARTIAL', 'COMPLETED', 'CANCELLED')),
     created_at text not null, 
-    script_id integer default null,
-    foreign key (script_id) references TradingScript(id)
+    is_from_script boolean default false
 );
  -- TODO create index on status for faster queries for open and partial
 
