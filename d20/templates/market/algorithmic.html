@@ -44,41 +44,19 @@
         <section class="mt-4">
             <h2 class="card-section-title">Algorithmic Trading</h2>
             <div class="row">
-                <!-- LEFT COLUMN: SCRIPTS LIST -->
-                <div class="col-3">
-                    <h3>Your Scripts</h3>
-                    <div class="list-group"
-                         id="scripts-list"
-                         style="max-height: 500px;
-                                overflow-y: auto">{% include 'market/htmx/_scripts_list.html' %}</div>
-                    <div class="mt-3">
-                        <button class="btn btn-success btn-sm w-100" onclick="createNewScript()">New Script</button>
-                    </div>
-                    <div id="script-actions" style="display: none;" class="mt-2">
-                        <button class="btn btn-warning btn-sm w-100" onclick="renameScript()">Rename</button>
-                        <button class="btn btn-danger btn-sm w-100 mt-2" onclick="deleteScript()">Delete</button>
-                    </div>
-                </div>
                 <!-- MIDDLE/RIGHT COLUMN: CODE EDITOR AND OUTPUT -->
-                <div class="col-9">
-                    <h3 id="current-script-name">Select or create a script</h3>
-                    <div class="row">
                         <!-- CODE EDITOR -->
                         <div class="col-6">
                             <h4>Code</h4>
-                            <div id="script-editor" style="min-height: 200px;">
-                                <p class="text-muted">Select a script to edit...</p>
-                            </div>
+                            {% include 'market/components/code_editor.html' %}
                             <div class="mt-3">
                                 <button type="button"
                                         class="btn btn-primary"
                                         id="run-button"
-                                        disabled
                                         onclick="runScript()">Run</button>
                                 <button type="button"
                                         class="btn btn-success"
                                         id="save-button"
-                                        disabled
                                         onclick="saveScript()">Save</button>
                             </div>
                         </div>
@@ -116,8 +94,6 @@
                                 <p id="error-message"></p>
                             </div>
                         </div>
-                    </div>
-                </div>
             </div>
         </section>
         <!-- SCRIPT ORDERS -->
@@ -148,55 +124,9 @@
         </section>
     </div>
     <script>
-        let currentScriptId = null;
-
-        // Refresh the scripts list
-        function refreshScriptsList() {
-            htmx.ajax('GET', '/market/algorithmic/load/scripts', {
-                target: '#scripts-list',
-                swap: 'innerHTML'
-            });
-        }
-
-        // Create a new script
-        function createNewScript() {
-            const name = prompt('Script name:', 'New Script');
-            if (name === null) return;
-
-            fetch('{{ url_for("market.create_script_endpoint") }}', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: name, code: '' })
-            }).then(r => r.json()).then(data => {
-                if (data.success) {
-                    refreshScriptsList();
-                } else {
-                    alert('Error: ' + data.error);
-                }
-            }).catch(error => {
-                alert('Error creating script: ' + error.message);
-            });
-        }
-
-        // Load script orders when editor loads
-        function loadScriptOrders(scriptId) {
-            currentScriptId = scriptId;
-            document.getElementById('script-actions').style.display = 'block';
-            document.getElementById('run-button').disabled = false;
-            document.getElementById('save-button').disabled = false;
-
-            // Fetch orders using HTMX
-            htmx.ajax('GET', `/market/algorithmic/load/orders/${scriptId}`, {
-                target: '#script-orders',
-                swap: 'innerHTML'
-            });
-        }
-
         // Run script and display output
         function runScript() {
-            if (!currentScriptId) return;
-
-            const code = document.getElementById('algo-code').value;
+            const code = getEditorCode();
             const outputContainer = document.getElementById('output-container');
             const errorContainer = document.getElementById('error-container');
             const errorMessage = document.getElementById('error-message');
@@ -207,15 +137,13 @@
             fetch('{{ url_for("market.algorithmic_run") }}', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ code: code, script_id: currentScriptId })
+                body: JSON.stringify({ code: code })
             }).then(r => r.json()).then(data => {
                 if (data.output) {
                     outputContainer.textContent = data.output;
                 } else {
                     outputContainer.textContent = '(no output)';
                 }
-                // Refresh the script's orders
-                loadScriptOrders(currentScriptId);
 
                 if (data.error) {
                     errorMessage.textContent = data.error;
@@ -228,82 +156,23 @@
                 errorMessage.textContent = `Network error: ${error.message}`;
                 errorContainer.style.display = 'block';
             });
-            const streamContainer = document.getElementById('streaming-output-container');
-            streamContainer.textContent = "";
-
-            document.getElementById('streaming-output-container').setAttribute(
-                'sse-connect', 
-                `/market/algorithmic/run/stream?script_id=${currentScriptId}&code=${code}`
-            );
-            htmx.process(document.getElementById('streaming-output-container'));
         }
 
         // Save script
         function saveScript() {
-            if (!currentScriptId) return;
+            const code = getEditorCode();
 
-            const code = document.getElementById('algo-code').value;
-            const name = document.getElementById('current-script-name').textContent;
-
-            fetch(`/market/algorithmic/scripts/${currentScriptId}`, {
-                method: 'PUT',
+            fetch('{{ url_for("market.save_script") }}', {
+                method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: name, code: code })
+                body: JSON.stringify({ code: code })
             }).then(r => r.json()).then(data => {
-                if (data.success) {
-                    console.log('Script saved');
+                if (!data.success) {
+                    alert('Error saving script: ' + (data.error || 'Unknown error'));
                 }
+            }).catch(error => {
+                alert('Error saving script: ' + error.message);
             });
-        }
-
-        function renameScript() {
-            if (!currentScriptId) return;
-            const newName = prompt('New script name:');
-            if (!newName) return;
-
-            const code = document.getElementById('algo-code').value;
-            fetch(`/market/algorithmic/scripts/${currentScriptId}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: newName, code: code })
-            }).then(() => refreshScriptsList());
-        }
-
-        function deleteScript() {
-            if (!currentScriptId || !confirm('Delete this script?')) return;
-
-            fetch(`/market/algorithmic/scripts/${currentScriptId}`, {
-                method: 'DELETE'
-            }).then(() => {
-                currentScriptId = null;
-                document.getElementById('script-editor').innerHTML = '<p class="text-muted">Select a script to edit...</p>';
-                document.getElementById('script-actions').style.display = 'none';
-                document.getElementById('run-button').disabled = true;
-                document.getElementById('save-button').disabled = true;
-                document.getElementById('current-script-name').textContent = 'Select or create a script';
-                document.getElementById('script-orders').innerHTML = '<tr><td colspan="9" class="text-muted">No orders.</td></tr>';
-                refreshScriptsList();
-            });
-        }
-
-        // Update code editor and buttons when editor loads
-        htmx.on('htmx:afterSettle', (e) => {
-            if (e.detail.target.id === 'script-editor') {
-                const scriptId = document.getElementById('current-script-id')?.value;
-                const scriptName = document.getElementById('current-script-name-value')?.value;
-                if (scriptName) {
-                    document.getElementById('current-script-name').textContent = scriptName;
-                }
-                if (scriptId) {
-                    loadScriptOrders(scriptId);
-                }
-            }
-        });
-
-        // Load first script if available
-        const firstScript = document.querySelector('.script-item');
-        if (firstScript) {
-            firstScript.click();
         }
     </script>
 {% endblock %}

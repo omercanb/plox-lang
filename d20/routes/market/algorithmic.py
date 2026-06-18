@@ -25,14 +25,12 @@ from . import bp, market_login_required
 def algorithmic():
     participant_id = g.market_participant["id"]
     inventory = get_participant_inventory(participant_id)
-    scripts = get_scripts_by_owner(participant_id)
 
     return render_template(
         "market/algorithmic.html",
         active_tab="algorithmic",
         participant=g.market_participant,
         inventory=inventory,
-        scripts=scripts,
     )
 
 
@@ -65,13 +63,11 @@ def algorithmic_run_stream():
 @market_login_required
 def algorithmic_run():
     """Execute algorithmic trading code and return results as JSON."""
-    code = request.json.get("code", "")
-    script_id = request.json.get("script_id")
     participant_id = g.market_participant["id"]
-    script = get_script(script_id)
-    update_script(script_id, script["name"], code)
+    code = request.json.get("code", "")
+    update_script(participant_id, code)
 
-    output, err = run_plox_and_capture(code, script_id)
+    output, err = run_plox_and_capture(code, 0)
     if err:
         result = {
             "success": False,

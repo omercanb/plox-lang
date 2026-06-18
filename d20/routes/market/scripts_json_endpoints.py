@@ -19,6 +19,18 @@ from d20.routes.market import market_api
 from . import bp, market_login_required
 
 
+
+@bp.route("/algorithmic/save_script", methods=("POST",))
+@market_login_required
+def save_script():
+    participant_id = g.market_participant["id"]
+    data = request.json
+    code = data.get("code", "")
+    update_script(participant_id, code)
+    return jsonify({"success": True})
+    
+
+
 @bp.route("/algorithmic/scripts", methods=("POST",))
 @market_login_required
 def create_script_endpoint():

@@ -150,6 +150,14 @@ def decrement_reserved_cash(participant_id, amount):
     )
     db.commit()
 
+def market_participant_set_script(participant_id, code):
+    db = get_db()
+    db.execute(
+            "update MarketPariticipant set script_code = ? where id = ?",
+            (code, participant_id)
+            )
+    db.commit()
+
 
 def delete_market_participant(participant_id):
     """Delete a market participant."""

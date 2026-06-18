@@ -1,0 +1,27 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js"></script>
+
+<div id="script-editor-container" style="border: 1px solid #ccc; border-radius: 4px;"></div>
+
+<script>
+    let codeEditor = CodeMirror(document.getElementById('script-editor-container'), {
+        value: `{{ g.market_participant['script_code'] | safe }}`,
+        mode: 'javascript',
+        theme: 'default',
+        lineNumbers: true,
+        indentUnit: 4,
+        lineWrapping: true,
+        tabSize: 2
+    });
+
+    // Expose getter for code content
+    window.getEditorCode = function() {
+        return codeEditor.getValue();
+    };
+
+    // Expose setter for code content
+    window.setEditorCode = function(code) {
+        codeEditor.setValue(code);
+    };
+</script>

@@ -41,22 +41,13 @@ def get_scripts_by_owner(owner_id):
         .fetchall()
     )
 
-
-def update_script(script_id, name, code):
-    """Update a script's name and code.
-    
-    Args:
-        script_id: ID of the script to update
-        name: New name
-        code: New code
-    """
+def update_script(participant_id, code):
     db = get_db()
     db.execute(
-        "update TradingScript set name = ?, code = ? where id = ?",
-        (name, code, script_id),
-    )
+            "update MarketPariticipant set script_code = ? where id = ?",
+            (code, participant_id)
+            )
     db.commit()
-
 
 def delete_script(script_id):
     """Delete a script by ID."""

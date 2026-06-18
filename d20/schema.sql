@@ -31,6 +31,7 @@ create table MarketPariticipant (
     availiable_cash decimal(10, 2),
     reserved_cash decimal(10, 2),
     -- The below is like an xor operator checking that either customer id or store id is set
+    script_code text not null default 'print("hello world");',
     check((customer_id is not null and store_id is null) or (customer_id is null and store_id is not null))
 );
 
@@ -94,14 +95,6 @@ create table MarketHistory (
     foreign key (sell_order_id) references Orders(id),
     foreign key (buyer_id) references MarketPariticipant(id),
     foreign key (seller_id) references MarketPariticipant(id)
-);
-
-create table TradingScript(
-    id integer primary key,
-    name text not null,
-    code text not null,
-    owner_id integer not null,
-    foreign key (owner_id) references MarketPariticipant(id)
 );
 
 create table Counter(
