@@ -33,9 +33,9 @@ def create_app(test_config=None):
     def hello():
         return "Hello, World!"
 
-    @app.route("/test")
-    def test():
-        return render_template("test.html")
+    # @app.route("/test")
+    # def test():
+    #     return render_template("test.html")
 
     from . import db
 
@@ -48,7 +48,7 @@ def create_app(test_config=None):
     from .routes import market
 
     app.register_blueprint(market.bp)
-    app.add_url_rule("/", endpoint="index")
+    app.add_url_rule("/", endpoint="market.portfolio")
 
     return app
 

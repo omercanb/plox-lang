@@ -8,7 +8,7 @@ from d20.db.market.market_participant import (
     get_market_participant_by_store,
 )
 
-bp = Blueprint("market", __name__, url_prefix="/market")
+bp = Blueprint("market", __name__)
 
 
 @bp.before_app_request

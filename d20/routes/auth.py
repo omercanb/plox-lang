@@ -66,7 +66,7 @@ def login():
         if error is None:
             session.clear()
             session["user_id"] = user["id"]
-            return redirect(url_for("index"))
+            return redirect(url_for("market.portfolio"))
 
         flash(error)
 
@@ -97,4 +97,5 @@ def login_required(view):
 @bp.route("/logout")
 def logout():
     session.clear()
-    return redirect(url_for("index"))
+    # TODO add a better page that can be viewed without being logged in
+    return redirect(url_for("auth.login"))

@@ -1,12 +1,11 @@
 {% extends 'base.html' %}
 {% block header %}
     <h1>
-        {% block title %}Trading Account - Trading{% endblock %}
+        {% block title %}Trading{% endblock %}
     </h1>
 {% endblock %}
 {% block content %}
     <div class="container">
-        {% include 'market/_subnav.html' %}
         <!-- TOP ROW: Cash Display + Inventory Display (Read-Only) -->
         <section class="mt-4">
             <div class="row">

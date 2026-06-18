@@ -26,7 +26,16 @@
         <ul class="navbar-nav d-flex flex-row gap-3">
             {% if g.user %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for("market.portfolio") }}">Market</a>
+                    <a class="nav-link" href="{{ url_for("market.portfolio") }}">Portfolio</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for("market.trading") }}">Trading</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for("market.history") }}">History</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for("market.algorithmic") }}">Algorithmic</a>
                 </li>
                 <li class="nav-item">
                     <span class="nav-link">{{ g.user['username'] }}</span>

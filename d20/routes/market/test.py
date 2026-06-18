@@ -23,9 +23,9 @@ def test(counter_id):
 @market_login_required
 def test_stream(counter_id):
     lines = [
-        "YO was good<div> code code code </div>",
-        "my gang",
-        "i hope the day is good",
+            "line1",
+            "line2",
+            "line3",
     ]
 
     def stream():
