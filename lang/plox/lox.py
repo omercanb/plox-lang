@@ -1,5 +1,6 @@
 import os
 import sys
+from pprint import pprint
 
 from plox.ast_printer import AstPrinter
 from plox.interpreter import Interpreter
@@ -58,6 +59,8 @@ def run_prompt() -> None:
 def run(source: str) -> None:
     scanner = Scanner(source)
     tokens = scanner.scan_tokens()
+    pprint(tokens)
+    
 
     parser = Parser(tokens)
     statements = parser.parse()

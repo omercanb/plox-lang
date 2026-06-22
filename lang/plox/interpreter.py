@@ -97,6 +97,11 @@ class Interpreter:
         elif token_type == TokenType.STAR:
             self.check_number_operands(node.op, left, right)
             return left * right
+        elif token_type == TokenType.MODULO:
+            self.check_number_operands(node.op, left, right)
+            if right == 0:
+                raise RuntimeError(node.op, "Modulo by zero.")
+            return left % right
         return None
 
     def visit_Logical(self, node: expr_module.Logical) -> Any:

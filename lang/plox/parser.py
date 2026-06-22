@@ -163,14 +163,33 @@ class Parser:
     def expression(self) -> expr_module.Expr:
         return self.assignment()
 
+
     def assignment(self) -> expr_module.Expr:
+        COMPOUND_ASSIGN = {
+            TokenType.PLUS_EQUAL:  TokenType.PLUS,
+            TokenType.MINUS_EQUAL: TokenType.MINUS,
+            TokenType.STAR_EQUAL:  TokenType.STAR,
+            TokenType.SLASH_EQUAL: TokenType.SLASH,
+            TokenType.MODULO_EQUAL: TokenType.MODULO,
+        }
+
         expr = self.or_()
+        if self.match(*COMPOUND_ASSIGN):
+            op_token = self.previous()
+            base_type = COMPOUND_ASSIGN[op_token.token_type]
+            value = self.assignment()
+            if isinstance(expr, expr_module.Variable):
+                base_op = Token(base_type, op_token.lexeme[0], None, op_token.line)
+                return expr_module.Assign(expr.name, expr_module.Binary(expr, base_op, value))
+            self.error(op_token, "Invalid assignment target.")
+
         if self.match(TokenType.EQUAL):
             equals = self.previous()
             value = self.assignment()
             if isinstance(expr, expr_module.Variable):
                 return expr_module.Assign(expr.name, value)
             self.error(equals, "Invalid assignment target.")
+
         return expr
 
     def or_(self) -> expr_module.Expr:
@@ -220,7 +239,7 @@ class Parser:
 
     def factor(self) -> expr_module.Expr:
         expr = self.unary()
-        while self.match(TokenType.SLASH, TokenType.STAR):
+        while self.match(TokenType.SLASH, TokenType.STAR, TokenType.MODULO):
             op = self.previous()
             right = self.unary()
             expr = expr_module.Binary(expr, op, right)

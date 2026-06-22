@@ -50,12 +50,23 @@ class Scanner:
             ";": TokenType.SEMICOLON,
             "*": TokenType.STAR,
             "/": TokenType.SLASH,
+            "%": TokenType.MODULO,
         }
 
         if c in single_char_tokens:
             if c == "/" and self.peek() == "/":
                 while self.peek() != "\n" and not self.is_at_end():
                     self.advance()
+            elif c == "+" and self.match("="):
+                self.add_token(TokenType.PLUS_EQUAL)
+            elif c == "-" and self.match("="):
+                self.add_token(TokenType.MINUS_EQUAL)
+            elif c == "*" and self.match("="):
+                self.add_token(TokenType.STAR_EQUAL)
+            elif c == "/" and self.match("="):
+                self.add_token(TokenType.SLASH_EQUAL)
+            elif c == "%" and self.match("="):
+                self.add_token(TokenType.MODULO_EQUAL)
             else:
                 self.add_token(single_char_tokens[c])
         elif c == "!":

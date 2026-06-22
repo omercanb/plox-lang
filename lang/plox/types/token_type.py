@@ -9,11 +9,12 @@ class TokenType(Enum):
     RIGHT_BRACE = auto()
     COMMA = auto()
     DOT = auto()
-    MINUS = auto()
-    PLUS = auto()
     SEMICOLON = auto()
     SLASH = auto()
+    MINUS = auto()
+    PLUS = auto()
     STAR = auto()
+    MODULO = auto()
 
     # One or two character tokens
     BANG = auto()
@@ -24,6 +25,11 @@ class TokenType(Enum):
     GREATER_EQUAL = auto()
     LESS = auto()
     LESS_EQUAL = auto()
+    PLUS_EQUAL = auto()
+    MINUS_EQUAL = auto()
+    STAR_EQUAL = auto()
+    SLASH_EQUAL = auto()
+    MODULO_EQUAL = auto()
 
     # Literals
     IDENTIFIER = auto()
