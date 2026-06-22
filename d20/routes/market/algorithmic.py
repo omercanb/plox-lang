@@ -11,8 +11,6 @@ from d20.db.market.participant_inventory import get_participant_inventory
 from d20.db.market.trading_scripts import (
     create_script,
     delete_script,
-    get_script,
-    get_scripts_by_owner,
     update_script,
 )
 from d20.routes.market import market_api
@@ -38,15 +36,11 @@ def algorithmic():
 @market_login_required
 def algorithmic_run_stream():
     """Execute algorithmic trading code and return results as JSON."""
-    code = request.args.get("code", "")
-    script_id = request.args.get("script_id")
-    print("here", script_id)
-    if not script_id:
-        return flask.Response(mimetype="text/event-stream")
-    script = get_script(script_id)
-    update_script(script_id, script["name"], code)
+    participant_id = g.market_participant["id"]
+    code = request.json.get("code", "")
+    update_script(participant_id, code)
 
-    output, err = run_plox_and_capture(code, script_id)
+    output, err = run_plox_and_capture(code, 0)
     lines = output.splitlines()
 
     def stream():

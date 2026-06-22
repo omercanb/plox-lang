@@ -29,18 +29,6 @@ def get_script(script_id):
         .fetchone()
     )
 
-
-def get_scripts_by_owner(owner_id):
-    """Get all scripts owned by a participant, ordered by name."""
-    return (
-        get_db()
-        .execute(
-            "select * from TradingScript where owner_id = ? order by name",
-            (owner_id,),
-        )
-        .fetchall()
-    )
-
 def update_script(participant_id, code):
     db = get_db()
     db.execute(

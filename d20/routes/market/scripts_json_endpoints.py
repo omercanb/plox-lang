@@ -11,7 +11,6 @@ from d20.db.market.trading_scripts import (
     create_script,
     delete_script,
     get_script,
-    get_scripts_by_owner,
     update_script,
 )
 from d20.routes.market import market_api
