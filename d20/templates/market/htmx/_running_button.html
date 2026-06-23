@@ -1,9 +1,0 @@
-<button hx-trigger="sse:done"
-        hx-get="{{ url_for("market.run_button", counter_id=counter_id) }}"
-        hx-target="#sse-connection"
-        hx-swap="outerHTML"
-        disabled
-        type="button"
-        class="btn btn-warning"
-        id="running-button">Running...</button>
-<!-- hx-trigger="sse:done from:body" -->
