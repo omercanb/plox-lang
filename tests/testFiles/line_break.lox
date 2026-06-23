@@ -1,0 +1,22 @@
+for (var i = 0; i < 5; i += 1) {
+    print(i);
+    print(i + 
+    "1");
+}
+
+fun foo(a,
+b) {
+print(a
++
+b)
+}
+foo("a",
+"b")
+
+fun boo(a) {
+    return 
+    a
+}
+
+print(boo("hoo"))
+
