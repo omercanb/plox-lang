@@ -93,7 +93,7 @@ class Scanner:
             pass
         elif c == "\n":
             # Semicolon inference method
-            if self.paren_depth == 0 and (self.tokens and self.tokens[-1].token_type != TokenType.SEMICOLON and self.tokens[-1].token_type != TokenType.LEFT_BRACE):
+            if self.paren_depth == 0 and (self.tokens and self.tokens[-1].token_type != TokenType.SEMICOLON and self.tokens[-1].token_type != TokenType.LEFT_BRACE and self.tokens[-1].token_type != TokenType.RIGHT_BRACE):
                 self.add_token(TokenType.SEMICOLON)
             self.line += 1
         elif c == '"':
@@ -103,9 +103,9 @@ class Scanner:
         elif c.isalpha() or c == "_":
             self.identifier()
         else:
-            from plox import lox
+            from plox import plox
 
-            lox.error(self.line, f"Unexpected character: {c}")
+            plox.error(self.line, f"Unexpected character: {c}")
 
     def identifier(self) -> None:
         while self.peek().isalnum() or self.peek() == "_":
@@ -130,9 +130,8 @@ class Scanner:
                 self.line += 1
             self.advance()
         if self.is_at_end():
-            from plox import lox
-
-            lox.error(self.line, "Unterminated string.")
+            from plox import plox
+            plox.error(self.line, "Unterminated string.")
             return
         self.advance()
         value = self.source[self.start + 1 : self.current - 1]

@@ -25,9 +25,9 @@ class Interpreter:
             for statement in statements:
                 self.execute(statement)
         except RuntimeError as error:
-            from plox import lox
+            from plox import plox
 
-            lox.runtime_error(error)
+            plox.runtime_error(error)
 
     def execute(self, statement: stmt_module.Stmt) -> None:
         self.visit(statement)

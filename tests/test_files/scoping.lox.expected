@@ -1,0 +1,7 @@
+(function scope (params a) (body (assign a local)))
+(var b = global b)
+(call print b)
+(call scope b)
+(call print b)
+global b
+global b

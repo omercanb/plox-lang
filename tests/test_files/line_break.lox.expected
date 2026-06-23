@@ -1,0 +1,17 @@
+(for (var i = 0.0) (< i 5.0) (assign i (+ i 1.0)) { (call print i) (call print (+ i 1)) })
+(function foo (params a b) (body (call print (+ a b))))
+(call foo a b)
+(function boo (params a) (body (return) a))
+(call print (call boo hoo))
+0
+01
+1
+11
+2
+21
+3
+31
+4
+41
+ab
+nil

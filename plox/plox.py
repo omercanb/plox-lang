@@ -9,13 +9,16 @@ from plox.scanner import Scanner
 
 had_error = False
 had_runtime_error = False
+
 print_tree = False
+print_lex = False
 
 interpreter = Interpreter()
 
 
 def main():
     global print_tree
+    global print_lex
 
     if len(sys.argv) > 3:
         print("Usage: lox [script] [--print]")
@@ -24,6 +27,10 @@ def main():
     if "--print" in sys.argv:
         print_tree = True
         sys.argv.remove("--print")
+
+    if "--print-lex" in sys.argv:
+        print_lex = True
+        sys.argv.remove("--print-lex")
 
     if len(sys.argv) == 2:
         run_file(sys.argv[1])
@@ -59,7 +66,8 @@ def run_prompt() -> None:
 def run(source: str) -> None:
     scanner = Scanner(source)
     tokens = scanner.scan_tokens()
-    pprint(tokens)
+    if print_lex:
+        pprint(tokens)
     
 
     parser = Parser(tokens)

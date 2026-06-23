@@ -328,9 +328,9 @@ class Parser:
         raise self.error(self.peek(), message)
 
     def error(self, token: Token, message: str) -> ParseError:
-        from plox import lox
+        from plox import plox
 
-        lox.error(token.line, message)
+        plox.error(token.line, message)
         raise ParseError()
 
     def synchronize(self) -> None:

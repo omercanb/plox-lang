@@ -1,0 +1,8 @@
+(function makeCounter (params ) (body (var i = 0.0) (function count (params ) (body (assign i (+ i 1.0)) (call print i))) (return count)))
+(var counter = (call makeCounter))
+(call print counter)
+(call counter)
+(call counter)
+<fn count>
+1
+2
