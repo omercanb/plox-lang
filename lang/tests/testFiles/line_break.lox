@@ -13,3 +13,10 @@ b)
 foo("a",
 "b")
 
+fun boo(a) {
+    return 
+    a
+}
+
+print(boo("hoo"))
+

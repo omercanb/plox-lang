@@ -61,15 +61,18 @@ class Parser:
             # An expression is returned
             value = self.expression()
 
-        self.consume(TokenType.SEMICOLON, "Expect ';' after return value.")
+        self.consume(TokenType.SEMICOLON, "Expect newline after return value.")
         return stmt_module.Return(keyword, value)
 
-    def var_declaration(self) -> stmt_module.Var:
+    def var_declaration(self, in_for = False) -> stmt_module.Var:
         name = self.consume(TokenType.IDENTIFIER, "Expect variable name.")
         initializer = None
         if self.match(TokenType.EQUAL):
             initializer = self.expression()
-        self.consume(TokenType.SEMICOLON, "Expect ';' after variable declaration.")
+        if in_for:
+            self.consume(TokenType.SEMICOLON, "Expect ';' after variable declaration.")
+        else:
+            self.consume(TokenType.SEMICOLON, "Expect newline after variable declaration.")
         return stmt_module.Var(name, initializer)
 
     def statement(self) -> stmt_module.Stmt:
@@ -95,9 +98,9 @@ class Parser:
         if self.match(TokenType.SEMICOLON):
             initializer = None
         elif self.match(TokenType.VAR):
-            initializer = self.var_declaration()
+            initializer = self.var_declaration(in_for=True)
         else:
-            initializer = self.expression_statement()
+            initializer = self.expression_statement(in_for=True)
 
         condition = None
         if not self.check(TokenType.SEMICOLON):
@@ -139,13 +142,13 @@ class Parser:
     def break_statement(self):
         if self.current_loop_nesting_depth == 0:
             self.error(self.previous(), "break not in loop.")
-        self.consume(TokenType.SEMICOLON, "Expect ';' after 'break'.")
+        self.consume(TokenType.SEMICOLON, "Expect newline after 'break'.")
         return stmt_module.Break()
 
     def continue_statement(self):
         if self.current_loop_nesting_depth == 0:
             self.error(self.previous(), "continue not in loop.")
-        self.consume(TokenType.SEMICOLON, "Expect ';' after 'continue'.")
+        self.consume(TokenType.SEMICOLON, "Expect newline after 'continue'.")
         return stmt_module.Continue()
 
     def block(self) -> List[stmt_module.Stmt]:
@@ -155,9 +158,12 @@ class Parser:
         self.consume(TokenType.RIGHT_BRACE, "Expect '}' after block.")
         return statements
 
-    def expression_statement(self):
+    def expression_statement(self, in_for = False):
         expr = self.expression()
-        self.consume(TokenType.SEMICOLON, "Expect ';' after expression.")
+        if in_for:
+            self.consume(TokenType.SEMICOLON, "Expect ';' after expression.")
+        else:
+            self.consume(TokenType.SEMICOLON, "Expect newline after expression.")
         return stmt_module.Expression(expr)
 
     def expression(self) -> expr_module.Expr:
