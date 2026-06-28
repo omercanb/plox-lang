@@ -3,6 +3,7 @@ from typing import Any, List, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from plox.types.lox_token import Token
+    import plox.types.stmt as stmt
 
 
 class Expr:
@@ -55,3 +56,9 @@ class Call(Expr):
     callee: Expr
     paren: "Token"
     arguments: List[Expr]
+
+
+@dataclass
+class LambdaFunction(Expr):
+    params: List["Token"]
+    body: List["stmt.Stmt"]

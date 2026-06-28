@@ -6,6 +6,7 @@ from plox.types.lox_token import Token
 
 class Scanner:
     paren_depth = 0
+    brace_depth = 0
 
     KEYWORDS: Dict[str, TokenType] = {
         "and": TokenType.AND,
@@ -75,6 +76,12 @@ class Scanner:
             elif c == ")":
                 self.paren_depth -= 1
                 self.add_token(TokenType.RIGHT_PAREN)
+            elif c == "{":
+                self.brace_depth += 1
+                self.add_token(TokenType.LEFT_BRACE)
+            elif c == "}":
+                self.brace_depth -= 1
+                self.add_token(TokenType.RIGHT_BRACE)
             else:
                 self.add_token(single_char_tokens[c])
         elif c == "!":
@@ -94,6 +101,9 @@ class Scanner:
         elif c == "\n":
             # Semicolon inference method
             if self.paren_depth == 0 and (self.tokens and self.tokens[-1].token_type != TokenType.SEMICOLON and self.tokens[-1].token_type != TokenType.LEFT_BRACE and self.tokens[-1].token_type != TokenType.RIGHT_BRACE):
+                self.add_token(TokenType.SEMICOLON)
+            # A lambda function can be defined directly inside the argument for a function
+            elif self.paren_depth > 0 and self.brace_depth > 0 and (self.tokens and self.tokens[-1].token_type != TokenType.SEMICOLON and self.tokens[-1].token_type != TokenType.LEFT_BRACE):
                 self.add_token(TokenType.SEMICOLON)
             self.line += 1
         elif c == '"':

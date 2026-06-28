@@ -1,4 +1,5 @@
 from typing import List, Optional
+from pprint import pprint
 
 from plox.types import expr as expr_module
 from plox.types import stmt as stmt_module
@@ -35,10 +36,13 @@ class Parser:
             self.synchronize()
             return None
 
-    # kind is used to distinguish functions and methods
-    def function(self, kind: str) -> stmt_module.Function:
-        name = self.consume(TokenType.IDENTIFIER, f"Expect {kind} name.")
-        self.consume(TokenType.LEFT_PAREN, f"Expect '(' after {kind} name.")
+    # kind is used to distinguish functions, methods, and lambdas
+    def function(self, kind: str) -> stmt_module.Function | expr_module.LambdaFunction:
+        if (kind == "lambda"):
+            self.consume(TokenType.LEFT_PAREN, f"Expect '(' after {kind}.")
+        else:
+            name = self.consume(TokenType.IDENTIFIER, f"Expect {kind} name.")
+            self.consume(TokenType.LEFT_PAREN, f"Expect '(' after {kind} name.")
         params = []
         if not self.check(TokenType.RIGHT_PAREN):
             while True:
@@ -52,7 +56,10 @@ class Parser:
         self.consume(TokenType.RIGHT_PAREN, "Expect ')' after parameters.")
         self.consume(TokenType.LEFT_BRACE, f"Expect '{{' before {kind} body.")
         body = self.block()
-        return stmt_module.Function(name, params, body)
+        if kind == "lambda":
+            return expr_module.LambdaFunction(params, body)
+        else:
+            return stmt_module.Function(name.lexeme, params, body)
 
     def return_(self) -> stmt_module.Return:
         keyword = self.previous()
@@ -290,10 +297,14 @@ class Parser:
             return expr_module.Literal(self.previous().literal)
         if self.match(TokenType.IDENTIFIER):
             return expr_module.Variable(self.previous())
+        if self.match(TokenType.FUN):
+            print("match lambda")
+            return self.function("lambda")
         if self.match(TokenType.LEFT_PAREN):
             expr = self.expression()
             self.consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.")
             return expr_module.Grouping(expr)
+        pprint(self.tokens)
         raise self.error(self.peek(), "Expect expression.")
 
     def match(self, *types: TokenType) -> bool:

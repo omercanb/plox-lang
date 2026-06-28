@@ -133,6 +133,9 @@ class Interpreter:
     def visit_Variable(self, node: expr_module.Variable) -> Any:
         return self.environment.get(node.name)
 
+    def visit_LambdaFunction(self, node: expr_module.LambdaFunction):
+        return LoxFunction(stmt_module.Function("<lambda>", node.params, node.body), self.environment)
+
     def visit_Call(self, node: expr_module.Call) -> Any:
         callee: Any = self.evaluate(node.callee)
         arguments: List[Any] = [self.evaluate(arg) for arg in node.arguments]
@@ -189,7 +192,7 @@ class Interpreter:
 
     def visit_Function(self, node: stmt_module.Function) -> None:
         function: LoxFunction = LoxFunction(node, self.environment)
-        self.environment.define(node.name.lexeme, function)
+        self.environment.define(node.literal_name, function)
 
     def visit_Return(self, node: stmt_module.Return) -> None:
         value: Any = None

@@ -49,7 +49,7 @@ class For(Stmt):
 
 @dataclass
 class Function(Stmt):
-    name: "Token"
+    literal_name: str
     params: List["Token"]
     body: List["Stmt"]
 
