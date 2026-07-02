@@ -6,8 +6,7 @@ from plox.types import expr as expr_module
 from plox.types import stmt as stmt_module
 from plox.types.control_flow import BreakException, ContinueException, ReturnException
 from plox.types.environment import Environment
-from plox.types.lox_callable import LoxCallable
-from plox.types.lox_function import LoxFunction
+from plox.types.lox_callable import LoxCallable, LoxFunction, LoxLambda
 from plox.types.lox_token import Token
 from plox.types.runtime_error import RuntimeError
 from plox.types.token_type import TokenType
@@ -134,7 +133,7 @@ class Interpreter:
         return self.environment.get(node.name)
 
     def visit_LambdaFunction(self, node: expr_module.LambdaFunction):
-        return LoxFunction(stmt_module.Function("<lambda>", node.params, node.body), self.environment)
+        return LoxLambda(node.params, node.body, self.environment)
 
     def visit_Call(self, node: expr_module.Call) -> Any:
         callee: Any = self.evaluate(node.callee)
@@ -192,7 +191,7 @@ class Interpreter:
 
     def visit_Function(self, node: stmt_module.Function) -> None:
         function: LoxFunction = LoxFunction(node, self.environment)
-        self.environment.define(node.literal_name, function)
+        self.environment.define(node.name.lexeme, function)
 
     def visit_Return(self, node: stmt_module.Return) -> None:
         value: Any = None

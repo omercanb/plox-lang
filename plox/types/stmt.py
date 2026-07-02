@@ -6,40 +6,41 @@ if TYPE_CHECKING:
     from plox.types.lox_token import Token
 
 
+@dataclass(eq=False)
 class Stmt:
     pass
 
 
-@dataclass
+@dataclass(eq=False)
 class Expression(Stmt):
     expr: "Expr"
 
 
-@dataclass
+@dataclass(eq=False)
 class Print(Stmt):
     expr: "Expr"
 
 
-@dataclass
+@dataclass(eq=False)
 class Var(Stmt):
     name: "Token"
     initializer: Optional["Expr"]
 
 
-@dataclass
+@dataclass(eq=False)
 class If(Stmt):
     condition: "Expr"
     then_branch: Stmt
     else_branch: Optional[Stmt]
 
 
-@dataclass
+@dataclass(eq=False)
 class While(Stmt):
     condition: "Expr"
     body: Stmt
 
 
-@dataclass
+@dataclass(eq=False)
 class For(Stmt):
     initializer: Optional[Stmt]
     condition: Optional["Expr"]
@@ -47,30 +48,30 @@ class For(Stmt):
     body: Stmt
 
 
-@dataclass
+@dataclass(eq=False)
 class Function(Stmt):
-    literal_name: str
+    name: "Token"
     params: List["Token"]
     body: List["Stmt"]
 
 
-@dataclass
+@dataclass(eq=False)
 class Return(Stmt):
     keyword: "Token"
     value: Optional["Expr"]
     pass
 
 
-@dataclass
+@dataclass(eq=False)
 class Break(Stmt):
     pass
 
 
-@dataclass
+@dataclass(eq=False)
 class Continue(Stmt):
     pass
 
 
-@dataclass
+@dataclass(eq=False)
 class Block(Stmt):
     statements: List["Stmt"]

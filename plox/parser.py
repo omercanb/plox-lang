@@ -1,5 +1,5 @@
-from typing import List, Optional
 from pprint import pprint
+from typing import List, Optional
 
 from plox.types import expr as expr_module
 from plox.types import stmt as stmt_module
@@ -38,7 +38,7 @@ class Parser:
 
     # kind is used to distinguish functions, methods, and lambdas
     def function(self, kind: str) -> stmt_module.Function | expr_module.LambdaFunction:
-        if (kind == "lambda"):
+        if kind == "lambda":
             self.consume(TokenType.LEFT_PAREN, f"Expect '(' after {kind}.")
         else:
             name = self.consume(TokenType.IDENTIFIER, f"Expect {kind} name.")
@@ -59,7 +59,7 @@ class Parser:
         if kind == "lambda":
             return expr_module.LambdaFunction(params, body)
         else:
-            return stmt_module.Function(name.lexeme, params, body)
+            return stmt_module.Function(name, params, body)
 
     def return_(self) -> stmt_module.Return:
         keyword = self.previous()
@@ -71,7 +71,7 @@ class Parser:
         self.consume(TokenType.SEMICOLON, "Expect newline after return value.")
         return stmt_module.Return(keyword, value)
 
-    def var_declaration(self, in_for = False) -> stmt_module.Var:
+    def var_declaration(self, in_for=False) -> stmt_module.Var:
         name = self.consume(TokenType.IDENTIFIER, "Expect variable name.")
         initializer = None
         if self.match(TokenType.EQUAL):
@@ -79,7 +79,9 @@ class Parser:
         if in_for:
             self.consume(TokenType.SEMICOLON, "Expect ';' after variable declaration.")
         else:
-            self.consume(TokenType.SEMICOLON, "Expect newline after variable declaration.")
+            self.consume(
+                TokenType.SEMICOLON, "Expect newline after variable declaration."
+            )
         return stmt_module.Var(name, initializer)
 
     def statement(self) -> stmt_module.Stmt:
@@ -165,7 +167,7 @@ class Parser:
         self.consume(TokenType.RIGHT_BRACE, "Expect '}' after block.")
         return statements
 
-    def expression_statement(self, in_for = False):
+    def expression_statement(self, in_for=False):
         expr = self.expression()
         if in_for:
             self.consume(TokenType.SEMICOLON, "Expect ';' after expression.")
@@ -176,12 +178,11 @@ class Parser:
     def expression(self) -> expr_module.Expr:
         return self.assignment()
 
-
     def assignment(self) -> expr_module.Expr:
         COMPOUND_ASSIGN = {
-            TokenType.PLUS_EQUAL:  TokenType.PLUS,
+            TokenType.PLUS_EQUAL: TokenType.PLUS,
             TokenType.MINUS_EQUAL: TokenType.MINUS,
-            TokenType.STAR_EQUAL:  TokenType.STAR,
+            TokenType.STAR_EQUAL: TokenType.STAR,
             TokenType.SLASH_EQUAL: TokenType.SLASH,
             TokenType.MODULO_EQUAL: TokenType.MODULO,
         }
@@ -193,7 +194,9 @@ class Parser:
             value = self.assignment()
             if isinstance(expr, expr_module.Variable):
                 base_op = Token(base_type, op_token.lexeme[0], None, op_token.line)
-                return expr_module.Assign(expr.name, expr_module.Binary(expr, base_op, value))
+                return expr_module.Assign(
+                    expr.name, expr_module.Binary(expr, base_op, value)
+                )
             self.error(op_token, "Invalid assignment target.")
 
         if self.match(TokenType.EQUAL):

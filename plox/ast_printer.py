@@ -75,7 +75,7 @@ class AstPrinter:
     def visit_Function(self, node: stmt_module.Function) -> str:
         return (
             "(function "
-            + node.literal_name
+            + node.name.lexeme
             + " "
             + "(params "
             + " ".join([param.lexeme for param in node.params])

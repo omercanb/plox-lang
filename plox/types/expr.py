@@ -6,59 +6,60 @@ if TYPE_CHECKING:
     import plox.types.stmt as stmt
 
 
+@dataclass(eq=False)
 class Expr:
     pass
 
 
-@dataclass
+@dataclass(eq=False)
 class Assign(Expr):
     name: "Token"
     value: Expr
 
 
-@dataclass
+@dataclass(eq=False)
 class Binary(Expr):
     left: Expr
     op: "Token"
     right: Expr
 
 
-@dataclass
+@dataclass(eq=False)
 class Logical(Expr):
     left: Expr
     op: "Token"
     right: Expr
 
 
-@dataclass
+@dataclass(eq=False)
 class Unary(Expr):
     op: "Token"
     right: Expr
 
 
-@dataclass
+@dataclass(eq=False)
 class Grouping(Expr):
     expr: Expr
 
 
-@dataclass
+@dataclass(eq=False)
 class Literal(Expr):
     value: Any
 
 
-@dataclass
+@dataclass(eq=False)
 class Variable(Expr):
     name: "Token"
 
 
-@dataclass
+@dataclass(eq=False)
 class Call(Expr):
     callee: Expr
     paren: "Token"
     arguments: List[Expr]
 
 
-@dataclass
+@dataclass(eq=False)
 class LambdaFunction(Expr):
     params: List["Token"]
     body: List["stmt.Stmt"]

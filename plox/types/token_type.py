@@ -53,4 +53,7 @@ class TokenType(Enum):
     VAR = auto()
     WHILE = auto()
 
+    # Empty token used for lambda
+    LAMBDA = auto()
+
     EOF = auto()
