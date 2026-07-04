@@ -7,17 +7,49 @@ from plox.types import stmt as stmt_module
 from plox.types.control_flow import BreakException, ContinueException, ReturnException
 from plox.types.environment import Environment
 from plox.types.lox_callable import LoxCallable, LoxFunction, LoxLambda
+from plox.types.lox_error import RuntimeError
 from plox.types.lox_token import Token
-from plox.types.runtime_error import RuntimeError
 from plox.types.token_type import TokenType
 
 
 class Interpreter:
-    def __init__(self) -> None:
+    def __init__(self, locals: dict[Token, int]) -> None:
         self.globals: Environment = Environment()
         self.environment: Environment = self.globals
         self.globals.define("clock", NativeClock())
         self.globals.define("print", NativePrint())
+        # A mapping of variables to how many scopes up the variable was defined
+        self.locals: dict[Token, int] = locals
+        print("locals!")
+        print(self.locals)
+        print("globals")
+        print(self.globals)
+
+    def get_variable(self, node: expr_module.Variable):
+        # print(node.name)
+        # if node.name in self.locals:
+        #     print(self.locals[node.name])
+        #
+        # print("local", self.environment.values)
+        # if self.environment.enclosing:
+        #     print("enclosing", self.environment.enclosing.values)
+        #     if self.environment.enclosing.enclosing:
+        #         print("double enclosing", self.environment.enclosing.enclosing.values)
+        name = node.name
+        if name in self.locals:
+            distance = self.locals[name]
+            return self.environment.get_at(name, distance)
+        else:
+            if name.lexeme in self.globals.values:
+                return self.globals.get_at(name, 0)
+            else:
+                raise RuntimeError(name, "Variable undefined")
+
+    def push_environment(self):
+        self.environment = Environment(self.environment)
+
+    def pop_environment(self):
+        self.environment = self.environment.enclosing
 
     def interpret(self, statements: List[stmt_module.Stmt]) -> None:
         try:
@@ -25,6 +57,8 @@ class Interpreter:
                 self.execute(statement)
         except RuntimeError as error:
             from plox import plox
+
+            print(self.environment.values)
 
             plox.runtime_error(error)
 
@@ -54,8 +88,8 @@ class Interpreter:
 
     # Expression visitors
     def visit_Assign(self, node: expr_module.Assign) -> Any:
-        value: Any = self.evaluate(node.value)
-        self.environment.assign(node.name, value)
+        value = self.evaluate(node.value)
+        self.environment.assign_at(node.name, value, self.locals[node.name])
         return value
 
     def visit_Binary(self, node: expr_module.Binary) -> Any:
@@ -130,10 +164,11 @@ class Interpreter:
         return node.value
 
     def visit_Variable(self, node: expr_module.Variable) -> Any:
-        return self.environment.get(node.name)
+        return self.get_variable(node)
 
     def visit_LambdaFunction(self, node: expr_module.LambdaFunction):
-        return LoxLambda(node.params, node.body, self.environment)
+        function = LoxLambda(node.params, node.body, self.environment)
+        return function
 
     def visit_Call(self, node: expr_module.Call) -> Any:
         callee: Any = self.evaluate(node.callee)
@@ -177,6 +212,7 @@ class Interpreter:
                 continue
 
     def visit_For(self, node: stmt_module.For) -> None:
+        self.push_environment()
         if node.initializer is not None:
             self.execute(node.initializer)
         while node.condition is None or self.is_truthy(self.evaluate(node.condition)):
@@ -188,9 +224,10 @@ class Interpreter:
                 pass
             if node.increment is not None:
                 self.evaluate(node.increment)
+        self.pop_environment()
 
     def visit_Function(self, node: stmt_module.Function) -> None:
-        function: LoxFunction = LoxFunction(node, self.environment)
+        function = LoxFunction(node, self.environment)
         self.environment.define(node.name.lexeme, function)
 
     def visit_Return(self, node: stmt_module.Return) -> None:
@@ -206,7 +243,9 @@ class Interpreter:
         raise ContinueException()
 
     def visit_Block(self, node: stmt_module.Block) -> None:
+        self.push_environment()
         self.execute_block(node.statements, Environment(self.environment))
+        self.pop_environment()
 
     # Helpers
     def is_truthy(self, value: Any) -> bool:

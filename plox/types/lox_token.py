@@ -1,9 +1,10 @@
 from dataclasses import dataclass
 from typing import Any
+
 from plox.types.token_type import TokenType
 
 
-@dataclass
+@dataclass(frozen=True)
 class Token:
     token_type: TokenType
     lexeme: str

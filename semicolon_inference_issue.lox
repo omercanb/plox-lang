@@ -1,0 +1,4 @@
+var a = fun(y) {
+    return y
+}
+a(z)

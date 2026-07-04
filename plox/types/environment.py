@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING, Any, Dict, Optional
 
-if TYPE_CHECKING:
-    from plox.types.lox_token import Token
+from plox.types.lox_error import RuntimeError
+from plox.types.lox_token import Token
 
 
 class Environment:
@@ -12,22 +12,35 @@ class Environment:
     def define(self, name: str, value: Any) -> None:
         self.values[name] = value
 
-    def get(self, name: "Token") -> Any:
-        if name.lexeme in self.values:
+    def get_at(self, name: Token, distance: int) -> Any:
+        if distance == 0:
+            # Static analysis should have told that this variable is undefined
+            if name.lexeme not in self.values:
+                raise RuntimeError(name, "Name not defined")
+            assert name.lexeme in self.values
             return self.values[name.lexeme]
-        if self.enclosing is not None:
-            return self.enclosing.get(name)
-        from plox.types.runtime_error import RuntimeError
+        return self.enclosing.get_at(name, distance - 1)
 
-        raise RuntimeError(name, f"Undefined variable '{name.lexeme}'.")
-
-    def assign(self, name: "Token", value: Any) -> None:
-        if name.lexeme in self.values:
+    def assign_at(self, name: Token, value: Any, distance: int):
+        if distance == 0:
             self.values[name.lexeme] = value
-            return
-        if self.enclosing is not None:
-            self.enclosing.assign(name, value)
-            return
-        from plox.types.runtime_error import RuntimeError
+        else:
+            self.enclosing.assign_at(name, value, distance - 1)
 
-        raise RuntimeError(name, f"Undefined variable '{name.lexeme}'.")
+    # def get(self, name: "Token") -> Any:
+    #     if name.lexeme in self.values:
+    #         return self.values[name.lexeme]
+    #     if self.enclosing is not None:
+    #         return self.enclosing.get(name)
+    #
+    #     raise RuntimeError(name, f"Undefined variable '{name.lexeme}'.")
+    #
+    # def assign(self, name: "Token", value: Any) -> None:
+    #     if name.lexeme in self.values:
+    #         self.values[name.lexeme] = value
+    #         return
+    #     if self.enclosing is not None:
+    #         self.enclosing.assign(name, value)
+    #         return
+    #
+    #     raise RuntimeError(name, f"Undefined variable '{name.lexeme}'.")

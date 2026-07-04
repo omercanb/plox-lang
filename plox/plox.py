@@ -1,10 +1,11 @@
 import os
 import sys
-from pprint import pprint
+from pprint import pp, pprint
 
 from plox.ast_printer import AstPrinter
 from plox.interpreter import Interpreter
 from plox.parser import Parser
+from plox.resolver import ScopeResolver
 from plox.scanner import Scanner
 
 had_error = False
@@ -12,8 +13,6 @@ had_runtime_error = False
 
 print_tree = False
 print_lex = False
-
-interpreter = Interpreter()
 
 
 def main():
@@ -68,7 +67,6 @@ def run(source: str) -> None:
     tokens = scanner.scan_tokens()
     if print_lex:
         pprint(tokens)
-    
 
     parser = Parser(tokens)
     statements = parser.parse()
@@ -83,6 +81,11 @@ def run(source: str) -> None:
     if had_error:
         return
 
+    scope_resolver = ScopeResolver()
+    scope_resolver.visit(statements)
+    pp(scope_resolver.locals)
+
+    interpreter = Interpreter(scope_resolver.locals)
     interpreter.interpret(statements)
 
 
@@ -95,6 +98,7 @@ def error(line: int, message: str) -> None:
 def runtime_error(error) -> None:
     global had_runtime_error
     print(f"[line {error.token.line}] Error: {error.message}", file=sys.stderr)
+    print(error)
     had_runtime_error = True
 
 
