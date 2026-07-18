@@ -137,6 +137,13 @@
   
   '''
 # ---
+# name: test_lox_file[lambda.lox]
+  '''
+  4
+  40
+  
+  '''
+# ---
 # name: test_lox_file[line_break.lox]
   '''
   [line 3] Error: Expect expression.

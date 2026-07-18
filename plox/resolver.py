@@ -1,10 +1,9 @@
 import dataclasses
 from dataclasses import dataclass, field
-from enum import Enum, auto
 
 import plox.types.expr as expr
 import plox.types.stmt as stmt
-from plox.types.environment import Environment
+from plox.types.enums import ClassType, FunctionType
 from plox.types.lox_error import StaticError
 from plox.types.lox_token import Token
 
@@ -40,20 +39,6 @@ class Scope:
             return self.enclosing.resolve(name, distance + 1)
         else:
             return None
-
-
-class FunctionType(Enum):
-    none = auto()
-    function = auto()
-    lmbda = auto()
-    method = auto()
-    initializer = auto()
-
-
-class ClassType(Enum):
-    none = auto()
-    cls = auto()
-    subclass = auto()
 
 
 # Must keep track of definititons and variable usages
@@ -107,7 +92,9 @@ class ScopeResolver:
         assert self.scope.enclosing is not None
         self.scope = self.scope.enclosing
 
-    def resolve_function(self, node: stmt.Function, function_type: FunctionType):
+    def resolve_function(
+        self, node: stmt.Function | expr.Lambda, function_type: FunctionType
+    ):
         enclosing_function = self.current_function
         self.current_function = function_type
         self.push_scope()
@@ -182,7 +169,7 @@ class ScopeResolver:
         self.scope.declare_define(node.name)
         self.resolve_function(node, FunctionType.function)
 
-    def visit_LambdaFunction(self, node: expr.LambdaFunction):
+    def visit_Lambda(self, node: expr.Lambda):
         self.resolve_function(node, FunctionType.lmbda)
 
     # Constructs that define a variable

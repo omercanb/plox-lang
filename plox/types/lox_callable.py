@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
-from plox.types import environment
+from plox.types import environment, expr
 from plox.types.control_flow import ReturnException
 from plox.types.environment import Environment
 from plox.types.lox_token import Token
@@ -64,7 +64,7 @@ class LoxFunction(LoxCallable):
 
 class LoxLambda(LoxCallable):
     def __init__(
-        self, params: List[Token], body: List[Stmt], closure: Environment
+        self, params: List[Token], body: expr.Expr, closure: Environment
     ) -> None:
         self.params = params
         self.body = body
@@ -77,13 +77,8 @@ class LoxLambda(LoxCallable):
         environment = Environment(self.closure)
         for param, arg in zip(self.params, arguments):
             environment.define(param.lexeme, arg)
-        try:
-            interpreter.execute_block(self.body, environment)
-        except ReturnException as e:
-            return e.value
-
-        # Function had no return value
-        return None
+        return_value = interpreter.evaluate_in_environment(self.body, environment)
+        return return_value
 
     def __str__(self) -> str:
         return f"<lambda>"

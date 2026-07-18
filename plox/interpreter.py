@@ -58,6 +58,16 @@ class Interpreter:
     def evaluate(self, expression: expr.Expr) -> Any:
         return self.visit(expression)
 
+    def evaluate_in_environment(
+        self, expression: expr.Expr, environment: Environment
+    ) -> Any:
+        previous = self.environment
+        try:
+            self.environment = environment
+            return self.visit(expression)
+        finally:
+            self.environment = previous
+
     def visit(self, node: Any) -> Any:
         method_name = f"visit_{type(node).__name__}"
         method = getattr(self, method_name, None)
@@ -176,7 +186,7 @@ class Interpreter:
             )
         return method.bind(this)
 
-    def visit_LambdaFunction(self, node: expr.LambdaFunction):
+    def visit_Lambda(self, node: expr.Lambda):
         function = LoxLambda(node.params, node.body, self.environment)
         return function
 

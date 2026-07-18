@@ -1,0 +1,6 @@
+var foo = fun(x) { 2 * x }
+print(foo(2))
+fun caller(f, x) {
+    return f(x)
+}
+print(caller(fun(x) {foo(x)}, 20))

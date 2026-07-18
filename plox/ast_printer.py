@@ -56,13 +56,13 @@ class AstPrinter:
         result = self.parenthesize("call", node.callee, *node.arguments)
         return result
 
-    def visit_LambdaFunction(self, node: expr.LambdaFunction) -> str:
+    def visit_Lambda(self, node: expr.Lambda) -> str:
         return (
             "(lambda "
             + "(params "
             + " ".join([param.lexeme for param in node.params])
             + ") "
-            + self.parenthesize("body", *node.body)
+            + self.visit(node.body)
             + ")"
         )
 

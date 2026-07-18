@@ -15,6 +15,7 @@ class Parser:
         self.tokens: List[Token] = tokens
         self.current: int = 0
         self.current_loop_nesting_depth: int = 0
+        self.in_lambda_body: bool = False
 
     def parse(self) -> List[stmts.Stmt]:
         statements = []
@@ -57,13 +58,33 @@ class Parser:
         return stmts.Class(name, methods, superclass)
 
     # kind is used to distinguish functions, methods, and lambdas
-    def function(self, kind: str) -> "stmts.Function | exprs.LambdaFunction":
-        name = None
-        if kind == "lambda":
-            self.consume(TokenType.LEFT_PAREN, f"Expect '(' after {kind}.")
-        else:
-            name = self.consume(TokenType.IDENTIFIER, f"Expect {kind} name.")
-            self.consume(TokenType.LEFT_PAREN, f"Expect '(' after {kind} name.")
+    def function(self, kind: str) -> "stmts.Function":
+        name = self.consume(TokenType.IDENTIFIER, f"Expect {kind} name.")
+        self.consume(TokenType.LEFT_PAREN, f"Expect '(' after {kind} name.")
+        params = self.parse_params()
+        self.consume(TokenType.RIGHT_PAREN, "Expect ')' after parameters.")
+        self.consume(TokenType.LEFT_BRACE, f"Expect '{{' before {kind} body.")
+        body = self.block()
+        return stmts.Function(name, params, body)
+
+    def parse_lambda(self) -> "exprs.Lambda":
+        # fun(x) { x + 2 }
+        #    ^
+        """Parse a lambda function having already consumed the 'fun'"""
+
+        self.consume(TokenType.LEFT_PAREN, f"Expect '(' after 'fun'.")
+        params = self.parse_params()
+        self.consume(TokenType.RIGHT_PAREN, "Expect ')' after parameters.")
+        self.consume(TokenType.LEFT_BRACE, "Expect '{' before anonymous function body.")
+
+        self.in_lambda_body = True
+        body = self.expression()
+        self.in_lambda_body = False
+
+        self.consume(TokenType.RIGHT_BRACE, "Expect '}' after anonymous function body.")
+        return exprs.Lambda(params, body)
+
+    def parse_params(self) -> "List[Token]":
         params = []
         if not self.check(TokenType.RIGHT_PAREN):
             while True:
@@ -74,13 +95,7 @@ class Parser:
                 )
                 if not self.match(TokenType.COMMA):
                     break
-        self.consume(TokenType.RIGHT_PAREN, "Expect ')' after parameters.")
-        self.consume(TokenType.LEFT_BRACE, f"Expect '{{' before {kind} body.")
-        body = self.block()
-        if kind == "lambda":
-            return exprs.LambdaFunction(params, body)
-        else:
-            return stmts.Function(name, params, body)
+        return params
 
     def return_(self) -> stmts.Return:
         keyword = self.previous()
@@ -328,14 +343,20 @@ class Parser:
             return self.parse_super()
         if self.match(TokenType.THIS):
             return exprs.This(self.previous())
+        if self.match(TokenType.FUN):
+            return self.parse_lambda()
         if self.match(TokenType.IDENTIFIER):
             return exprs.Variable(self.previous())
-        if self.match(TokenType.FUN):
-            return self.function("lambda")
         if self.match(TokenType.LEFT_PAREN):
             expr = self.expression()
             self.consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.")
             return exprs.Grouping(expr)
+        self.primary_error()
+
+    def primary_error(self):
+        """Provide an error message based on available context when a primary doesn't parse"""
+        if self.in_lambda_body:
+            raise self.error(self.peek(), "Lambda body must be a single expression.")
         raise self.error(self.peek(), "Expect expression.")
 
     def parse_super(self):

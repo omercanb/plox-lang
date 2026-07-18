@@ -84,6 +84,6 @@ class Set(Expr):
 
 
 @dataclass(eq=False)
-class LambdaFunction(Expr):
+class Lambda(Expr):
     params: List["Token"]
-    body: List["stmt.Stmt"]
+    body: "Expr"

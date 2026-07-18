@@ -2,12 +2,10 @@ from typing import Any, Dict, List
 
 from plox.types.lox_token import Token
 from plox.types.token_type import TokenType
+from plox.semicolon_inference import SemicolonInference
 
 
 class Scanner:
-    paren_depth = 0
-    brace_depth = 0
-
     KEYWORDS: Dict[str, TokenType] = {
         "and": TokenType.AND,
         "break": TokenType.BREAK,
@@ -34,6 +32,7 @@ class Scanner:
         self.start: int = 0
         self.current: int = 0
         self.line: int = 1
+        self.semicolon_inference = SemicolonInference()
 
     def scan_tokens(self) -> List[Token]:
         while not self.is_at_end():
@@ -74,17 +73,17 @@ class Scanner:
             elif c == "%" and self.match("="):
                 self.add_token(TokenType.MODULO_EQUAL)
             elif c == "(":
-                self.paren_depth += 1
                 self.add_token(TokenType.LEFT_PAREN)
+                self.semicolon_inference.update(TokenType.LEFT_PAREN)
             elif c == ")":
-                self.paren_depth -= 1
                 self.add_token(TokenType.RIGHT_PAREN)
+                self.semicolon_inference.update(TokenType.RIGHT_PAREN)
             elif c == "{":
-                self.brace_depth += 1
                 self.add_token(TokenType.LEFT_BRACE)
+                self.semicolon_inference.update(TokenType.LEFT_BRACE)
             elif c == "}":
-                self.brace_depth -= 1
                 self.add_token(TokenType.RIGHT_BRACE)
+                self.semicolon_inference.update(TokenType.RIGHT_BRACE)
             else:
                 self.add_token(single_char_tokens[c])
         elif c == "!":
@@ -102,23 +101,9 @@ class Scanner:
         elif c == " " or c == "\r" or c == "\t":
             pass
         elif c == "\n":
-            # Semicolon inference method
-            if self.paren_depth == 0 and (
-                self.tokens
-                and self.tokens[-1].token_type != TokenType.SEMICOLON
-                and self.tokens[-1].token_type != TokenType.LEFT_BRACE
-                and self.tokens[-1].token_type != TokenType.RIGHT_BRACE
-            ):
-                self.add_token(TokenType.SEMICOLON)
-            # A lambda function can be defined directly inside the argument for a function
-            elif (
-                self.paren_depth > 0
-                and self.brace_depth > 0
-                and (
-                    self.tokens
-                    and self.tokens[-1].token_type != TokenType.SEMICOLON
-                    and self.tokens[-1].token_type != TokenType.LEFT_BRACE
-                )
+            # Semicolon inference: check if we should add semicolon before newline
+            if self.tokens and self.semicolon_inference.should_add_semicolon_before_newline(
+                self.tokens[-1].token_type
             ):
                 self.add_token(TokenType.SEMICOLON)
             self.line += 1
@@ -139,6 +124,7 @@ class Scanner:
         text = self.source[self.start : self.current]
         token_type = self.KEYWORDS.get(text, TokenType.IDENTIFIER)
         self.add_token(token_type)
+        self.semicolon_inference.update(token_type)
 
     def number(self) -> None:
         while self.peek().isdigit():
