@@ -1,0 +1,46 @@
+var arr = array()
+arr[2]
+assert(arr.length() == 0)
+
+arr.append(10)
+arr.append(20)
+arr.append(30)
+assert(arr.length() == 3)
+
+assert(arr[0] == 10)
+assert(arr[1] == 20)
+assert(arr[2] == 30)
+
+arr[1] = 99
+assert(arr[1] == 99)
+
+arr.remove(99)
+assert(arr.length() == 2)
+
+arr.insert(1, 15)
+assert(arr.length() == 3)
+assert(arr[1] == 15)
+
+assert(arr.index(15) == 1)
+
+assert(arr.first() == 10)
+assert(arr.last() == 30)
+
+assert(arr.contains(15) == true)
+assert(arr.contains(999) == false)
+
+arr.reverse()
+assert(arr[0] == 30)
+assert(arr[1] == 15)
+assert(arr[2] == 10)
+
+var removed = arr.remove_at(1)
+assert(removed == 15)
+assert(arr.length() == 2)
+
+var popped = arr.pop()
+assert(popped == 10)
+assert(arr.length() == 1)
+
+arr.clear()
+assert(arr.length() == 0)

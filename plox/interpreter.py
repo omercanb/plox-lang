@@ -1,5 +1,7 @@
 from typing import Any, Dict, List
 
+from plox.native_functions.native_array import NativeArray
+from plox.native_functions.native_assert import NativeAssert
 from plox.native_functions.native_clock import NativeClock
 from plox.native_functions.native_print import NativePrint
 from plox.types import environment, expr, stmt
@@ -23,6 +25,8 @@ class Interpreter:
         self.environment: Environment = self.globals
         self.globals.define("clock", NativeClock())
         self.globals.define("print", NativePrint())
+        self.globals.define("array", NativeArray())
+        self.globals.define("assert", NativeAssert())
         # A mapping of variables to how many scopes up the variable was defined
         self.locals: dict[Token, int] = locals
 
@@ -203,6 +207,7 @@ class Interpreter:
         return callee.call(self, arguments)
 
     def visit_Get(self, node: expr.Get):
+
         object = self.evaluate(node.object)
         if not isinstance(object, LoxInstance):
             raise RuntimeError(node.name, "Only instances have properties.")
@@ -217,10 +222,27 @@ class Interpreter:
         return value
 
     def visit_Index(self, node: expr.Index):
-        raise RuntimeError(node.bracket, "Indexing not yet implemented.")
+        from plox.native_functions.native_array import LoxArray
+
+        obj = self.evaluate(node.object)
+        index = self.evaluate(node.index)
+
+        if isinstance(obj, LoxArray):
+            return obj.get_index(node.bracket, index)
+
+        raise RuntimeError(node.bracket, "Only arrays support indexing.")
 
     def visit_IndexAssign(self, node: expr.IndexAssign):
-        raise RuntimeError(node.bracket, "Index assignment not yet implemented.")
+        from plox.native_functions.native_array import LoxArray
+
+        obj = self.evaluate(node.object)
+        index = self.evaluate(node.index)
+        value = self.evaluate(node.value)
+
+        if isinstance(obj, LoxArray):
+            return obj.set_index(node.bracket, index, value)
+
+        raise RuntimeError(node.bracket, "Only arrays support indexing.")
 
     # Statement visitors
     def visit_Expression(self, node: stmt.Expression) -> None:
@@ -317,6 +339,8 @@ class Interpreter:
     def is_truthy(self, value: Any) -> bool:
         if value is None or value is False:
             return False
+        if hasattr(value, "is_truthy") and callable(getattr(value, "is_truthy")):
+            return value.is_truthy()
         return True
 
     def is_equal(self, a: Any, b: Any) -> bool:
