@@ -8,8 +8,6 @@ from plox.types.environment import Environment
 from plox.types.lox_error import StaticError
 from plox.types.lox_token import Token
 
-# Walk the ast and resolve all variables to their definitions
-
 
 @dataclass
 class Scope:
@@ -55,6 +53,7 @@ class FunctionType(Enum):
 class ClassType(Enum):
     none = auto()
     cls = auto()
+    subclass = auto()
 
 
 # Must keep track of definititons and variable usages
@@ -144,6 +143,9 @@ class ScopeResolver:
                 raise StaticError(
                     node.superclass.name, "A class can't inherit from itself."
                 )
+            self.push_scope()
+            self.scope.bindings["super"] = True
+            self.current_class = ClassType.subclass
 
         self.push_scope()
 
@@ -157,12 +159,23 @@ class ScopeResolver:
 
             self.resolve_function(method, function_type)
 
+        if node.superclass:
+            self.pop_scope()
+
         self.pop_scope()
         self.current_class = enclosing_class
 
     def visit_This(self, node: expr.This):
         if self.current_class == ClassType.none:
             raise StaticError(node.keyword, "'this' can only be used inside classes.")
+        self.resolve_local(node.keyword)
+
+    def visit_Super(self, node: expr.Super):
+        if self.current_class == ClassType.none:
+            raise StaticError(node.keyword, "Can't use 'super' outside of class.")
+        if self.current_class == ClassType.cls:
+            raise StaticError(node.keyword, "Can't use 'super' with no superclass.")
+
         self.resolve_local(node.keyword)
 
     def visit_Function(self, node: stmt.Function):

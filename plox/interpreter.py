@@ -29,10 +29,10 @@ class Interpreter:
     def get_variable(self, name: Token):
         if name in self.locals:
             distance = self.locals[name]
-            return self.environment.get_at(name, distance)
+            return self.environment.get_at(name.lexeme, distance)
         else:
             if name.lexeme in self.globals.values:
-                return self.globals.get_at(name, 0)
+                return self.globals.get_at(name.lexeme, 0)
             else:
                 raise RuntimeError(name, "Variable undefined")
 
@@ -40,6 +40,7 @@ class Interpreter:
         self.environment = Environment(self.environment)
 
     def pop_environment(self):
+        assert self.environment.enclosing
         self.environment = self.environment.enclosing
 
     def interpret(self, statements: List[stmt.Stmt]) -> None:
@@ -162,6 +163,19 @@ class Interpreter:
     def visit_This(self, node: expr.This):
         return self.get_variable(node.keyword)
 
+    def visit_Super(self, node: expr.Super):
+        distance = self.locals[node.keyword]
+        superclass = self.environment.get_at("super", distance)
+        assert isinstance(superclass, LoxClass)
+        # distance - 1 to get 'this' which is in the inner environment
+        this = self.environment.get_at("this", distance - 1)
+        method = superclass.find_method(node.method.lexeme)
+        if not method:
+            raise RuntimeError(
+                node.method, f"Undefined property '{node.method.lexeme}'."
+            )
+        return method.bind(this)
+
     def visit_LambdaFunction(self, node: expr.LambdaFunction):
         function = LoxLambda(node.params, node.body, self.environment)
         return function
@@ -233,9 +247,6 @@ class Interpreter:
         self.pop_environment()
 
     def visit_Class(self, node: stmt.Class):
-        # First declare the class name so it can be referenced inside the class
-        self.environment.define(node.name.lexeme, None)
-
         if node.superclass:
             superclass = self.evaluate(node.superclass)
             if not isinstance(superclass, LoxClass):
@@ -243,11 +254,23 @@ class Interpreter:
         else:
             superclass = None
 
+        # First declare the class name so it can be referenced inside the class
+        self.environment.define(node.name.lexeme, None)
+
+        # Create a scope for the super to match the resolver
+        # We need to resolve 'super' based on the class of the method using super, not the instance in which this method is used
+        if superclass:
+            self.push_environment()
+            self.environment.define("super", superclass)
+
         methods: Dict[str, LoxFunction] = {}
         for method in node.methods:
             is_initializer = method.name.lexeme == "init"
             function = LoxFunction(method, self.environment, is_initializer)
             methods[method.name.lexeme] = function
+
+        if superclass:
+            self.pop_environment()
 
         cls = LoxClass(node.name, methods, superclass)
 

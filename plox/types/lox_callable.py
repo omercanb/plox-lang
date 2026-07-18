@@ -104,19 +104,28 @@ class LoxClass(LoxCallable):
         return f"<class {self.name.lexeme}>"
 
     def arity(self):
-        initializer = self.methods.get("init")
+        initializer = self.find_method("init")
         if initializer:
             return initializer.arity()
         return 0
 
     def call(self, interpreter, arguments):
         instance = LoxInstance(self)
-        initializer = self.methods.get("init")
+        initializer = self.find_method("init")
         if initializer:
             instance = initializer.bind(instance).call(interpreter, arguments)
             assert isinstance(instance, LoxInstance)
             return instance
         return instance
+
+    def find_method(self, name: str):
+        if method := self.methods.get(name):
+            return method
+
+        if self.superclass:
+            return self.superclass.find_method(name)
+
+        return None
 
 
 class LoxInstance:
@@ -127,8 +136,7 @@ class LoxInstance:
     def get(self, name: Token):
         if name.lexeme in self.fields:
             return self.fields[name.lexeme]
-        if name.lexeme in self.cls.methods:
-            method = self.cls.methods[name.lexeme]
+        if method := self.cls.find_method(name.lexeme):
             return method.bind(self)
         raise RuntimeError(f"Undefined property {name.lexeme} on '{str(self)}'")
 

@@ -131,6 +131,12 @@
   
   '''
 # ---
+# name: test_lox_file[inheritance.lox]
+  '''
+  A method
+  
+  '''
+# ---
 # name: test_lox_file[line_break.lox]
   '''
   [line 3] Error: Expect expression.

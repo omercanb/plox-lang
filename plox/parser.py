@@ -324,6 +324,8 @@ class Parser:
             return exprs.Literal(None)
         if self.match(TokenType.NUMBER, TokenType.STRING):
             return exprs.Literal(self.previous().literal)
+        if self.match(TokenType.SUPER):
+            return self.parse_super()
         if self.match(TokenType.THIS):
             return exprs.This(self.previous())
         if self.match(TokenType.IDENTIFIER):
@@ -335,6 +337,14 @@ class Parser:
             self.consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.")
             return exprs.Grouping(expr)
         raise self.error(self.peek(), "Expect expression.")
+
+    def parse_super(self):
+        keyword = self.previous()
+        self.consume(TokenType.DOT, "Expect '.' after 'super'.")
+        method = self.consume(
+            TokenType.IDENTIFIER, "Expect superclass method name after 'super'."
+        )
+        return exprs.Super(keyword, method)
 
     def match(self, *types: TokenType) -> bool:
         for token_type in types:

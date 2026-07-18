@@ -12,19 +12,19 @@ class Environment:
     def define(self, name: str, value: Any) -> None:
         self.values[name] = value
 
-    def get_at(self, name: Token, distance: int) -> Any:
+    def get_at(self, name: str, distance: int) -> Any:
         if distance == 0:
             # Static analysis should have told that this variable is undefined
-            if name.lexeme not in self.values:
-                raise RuntimeError(name, "Name not defined")
-            assert name.lexeme in self.values
-            return self.values[name.lexeme]
+            assert name in self.values
+            return self.values[name]
+        assert self.enclosing
         return self.enclosing.get_at(name, distance - 1)
 
     def assign_at(self, name: Token, value: Any, distance: int):
         if distance == 0:
             self.values[name.lexeme] = value
         else:
+            assert self.enclosing
             self.enclosing.assign_at(name, value, distance - 1)
 
     def assign(self, name: Token, value):

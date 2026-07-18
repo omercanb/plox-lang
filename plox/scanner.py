@@ -17,6 +17,7 @@ class Scanner:
         "for": TokenType.FOR,
         "class": TokenType.CLASS,
         "this": TokenType.THIS,
+        "super": TokenType.SUPER,
         "fun": TokenType.FUN,
         "if": TokenType.IF,
         "nil": TokenType.NIL,

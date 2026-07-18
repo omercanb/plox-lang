@@ -49,9 +49,22 @@ class AstPrinter:
     def visit_This(self, node: expr.This):
         return "this"
 
+    def visit_Super(self, node: expr.Super):
+        return f"super.{self.visit(node.method)}"
+
     def visit_Call(self, node: expr.Call) -> str:
         result = self.parenthesize("call", node.callee, *node.arguments)
         return result
+
+    def visit_LambdaFunction(self, node: expr.LambdaFunction) -> str:
+        return (
+            "(lambda "
+            + "(params "
+            + " ".join([param.lexeme for param in node.params])
+            + ") "
+            + self.parenthesize("body", *node.body)
+            + ")"
+        )
 
     def visit_Get(self, node: expr.Get):
         return f"({self.visit(node.object)}.{self.visit(node.name)})"

@@ -58,6 +58,12 @@ class This(Expr):
 
 
 @dataclass(eq=False)
+class Super(Expr):
+    keyword: "Token"
+    method: "Token"
+
+
+@dataclass(eq=False)
 class Call(Expr):
     callee: Expr
     paren: "Token"
