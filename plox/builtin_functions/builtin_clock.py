@@ -7,7 +7,7 @@ if TYPE_CHECKING:
     from plox.interpreter import Interpreter
 
 
-class NativeClock(LoxCallable):
+class BuiltinClock(LoxCallable):
     def arity(self) -> int:
         return 0
 
@@ -15,4 +15,4 @@ class NativeClock(LoxCallable):
         return time.time()
 
     def __str__(self) -> str:
-        return "<native fn>"
+        return "<builtin clock>"

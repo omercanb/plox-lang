@@ -1,4 +1,7 @@
 # serializer version: 1
+# name: test_lox_file[array.lox]
+  ''
+# ---
 # name: test_lox_file[bound_methods.lox]
   '''
   Jane

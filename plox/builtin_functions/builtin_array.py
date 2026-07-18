@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING, Any, List
 
-from plox.native_functions.native_classes import NativeClass
+from plox.builtin_functions.builtin_classes import BuiltinClass
 from plox.types.lox_callable import LoxCallable, LoxInstance
 from plox.types.lox_error import RuntimeError
 from plox.types.lox_token import Token
@@ -9,14 +9,14 @@ if TYPE_CHECKING:
     from plox.interpreter import Interpreter
 
 
-class NativeArrayMethod(LoxCallable):
+class BuiltinArrayMethod(LoxCallable):
     """Base class for array methods"""
 
     def __init__(self, array: "LoxArray"):
         self.array = array
 
 
-class AppendMethod(NativeArrayMethod):
+class AppendMethod(BuiltinArrayMethod):
     def arity(self) -> int:
         return 1
 
@@ -28,7 +28,7 @@ class AppendMethod(NativeArrayMethod):
         return "<array method append>"
 
 
-class PopMethod(NativeArrayMethod):
+class PopMethod(BuiltinArrayMethod):
     def arity(self) -> int:
         return 0
 
@@ -41,7 +41,7 @@ class PopMethod(NativeArrayMethod):
         return "<array method pop>"
 
 
-class LengthMethod(NativeArrayMethod):
+class LengthMethod(BuiltinArrayMethod):
     def arity(self) -> int:
         return 0
 
@@ -52,7 +52,7 @@ class LengthMethod(NativeArrayMethod):
         return "<array method length>"
 
 
-class ClearMethod(NativeArrayMethod):
+class ClearMethod(BuiltinArrayMethod):
     def arity(self) -> int:
         return 0
 
@@ -64,7 +64,7 @@ class ClearMethod(NativeArrayMethod):
         return "<array method clear>"
 
 
-class RemoveMethod(NativeArrayMethod):
+class RemoveMethod(BuiltinArrayMethod):
     def arity(self) -> int:
         return 1
 
@@ -79,7 +79,7 @@ class RemoveMethod(NativeArrayMethod):
         return "<array method remove>"
 
 
-class InsertMethod(NativeArrayMethod):
+class InsertMethod(BuiltinArrayMethod):
     def arity(self) -> int:
         return 2
 
@@ -94,7 +94,7 @@ class InsertMethod(NativeArrayMethod):
         return "<array method insert>"
 
 
-class IndexMethod(NativeArrayMethod):
+class IndexMethod(BuiltinArrayMethod):
     def arity(self) -> int:
         return 1
 
@@ -109,7 +109,7 @@ class IndexMethod(NativeArrayMethod):
         return "<array method index>"
 
 
-class ReverseMethod(NativeArrayMethod):
+class ReverseMethod(BuiltinArrayMethod):
     def arity(self) -> int:
         return 0
 
@@ -121,7 +121,7 @@ class ReverseMethod(NativeArrayMethod):
         return "<array method reverse>"
 
 
-class ContainsMethod(NativeArrayMethod):
+class ContainsMethod(BuiltinArrayMethod):
     def arity(self) -> int:
         return 1
 
@@ -132,7 +132,7 @@ class ContainsMethod(NativeArrayMethod):
         return "<array method contains>"
 
 
-class FirstMethod(NativeArrayMethod):
+class FirstMethod(BuiltinArrayMethod):
     def arity(self) -> int:
         return 0
 
@@ -145,7 +145,7 @@ class FirstMethod(NativeArrayMethod):
         return "<array method first>"
 
 
-class LastMethod(NativeArrayMethod):
+class LastMethod(BuiltinArrayMethod):
     def arity(self) -> int:
         return 0
 
@@ -158,7 +158,7 @@ class LastMethod(NativeArrayMethod):
         return "<array method last>"
 
 
-class RemoveAtMethod(NativeArrayMethod):
+class RemoveAtMethod(BuiltinArrayMethod):
     def arity(self) -> int:
         return 1
 
@@ -172,7 +172,7 @@ class RemoveAtMethod(NativeArrayMethod):
         return "<array method remove_at>"
 
 
-class NativeArray(NativeClass):
+class BuiltinArray(BuiltinClass):
     def __init__(self):
         from plox.types.lox_token import Token
         from plox.types.token_type import TokenType
@@ -187,11 +187,11 @@ class NativeArray(NativeClass):
         return LoxArray(self)
 
     def __str__(self):
-        return "<native fn array>"
+        return "<builtin fn array>"
 
 
 class LoxArray(LoxInstance):
-    def __init__(self, cls: NativeArray):
+    def __init__(self, cls: BuiltinArray):
         self.cls = cls
         self.elements: List[Any] = []
 

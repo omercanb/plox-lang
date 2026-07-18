@@ -6,7 +6,7 @@ if TYPE_CHECKING:
     from plox.interpreter import Interpreter
 
 
-class NativePrint(LoxCallable):
+class BuiltinPrint(LoxCallable):
     def arity(self) -> int:
         return 1
 
@@ -15,4 +15,4 @@ class NativePrint(LoxCallable):
         return None
 
     def __str__(self) -> str:
-        return "<native fn>"
+        return "<builtin print>"

@@ -1,3 +1,5 @@
+var a = 3
+a[3]
 var arr = array()
 assert(arr.length() == 0)
 

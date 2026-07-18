@@ -96,7 +96,7 @@ def error(line: int, message: str) -> None:
 
 def runtime_error(error) -> None:
     global had_runtime_error
-    print(f"[line {error.token.line}] Error: {error.message}", file=sys.stderr)
+    # print(f"[line {error.token.line}] Error: {error.message}", file=sys.stderr)
     print(error)
     had_runtime_error = True
 

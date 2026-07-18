@@ -1,9 +1,9 @@
 from typing import Any, Dict, List
 
-from plox.native_functions.native_array import NativeArray
-from plox.native_functions.native_assert import NativeAssert
-from plox.native_functions.native_clock import NativeClock
-from plox.native_functions.native_print import NativePrint
+from plox.builtin_functions.builtin_array import BuiltinArray
+from plox.builtin_functions.builtin_assert import BuiltinAssert
+from plox.builtin_functions.builtin_clock import BuiltinClock
+from plox.builtin_functions.builtin_print import BuiltinPrint
 from plox.types import environment, expr, stmt
 from plox.types.control_flow import BreakException, ContinueException, ReturnException
 from plox.types.environment import Environment
@@ -23,10 +23,10 @@ class Interpreter:
     def __init__(self, locals: dict[Token, int]) -> None:
         self.globals: Environment = Environment()
         self.environment: Environment = self.globals
-        self.globals.define("clock", NativeClock())
-        self.globals.define("print", NativePrint())
-        self.globals.define("array", NativeArray())
-        self.globals.define("assert", NativeAssert())
+        self.globals.define("clock", BuiltinClock())
+        self.globals.define("print", BuiltinPrint())
+        self.globals.define("array", BuiltinArray())
+        self.globals.define("assert", BuiltinAssert())
         # A mapping of variables to how many scopes up the variable was defined
         self.locals: dict[Token, int] = locals
 
@@ -198,16 +198,15 @@ class Interpreter:
         callee: Any = self.evaluate(node.callee)
         arguments: List[Any] = [self.evaluate(arg) for arg in node.arguments]
         if not isinstance(callee, LoxCallable):
-            raise RuntimeError(node.paren, "Can only call functions and classes.")
+            raise RuntimeError(node.callee, "Can only call functions and classes.")
         if len(arguments) != callee.arity():
             raise RuntimeError(
-                node.paren,
+                node.callee,
                 f"Expected {callee.arity()} arguments but got {len(arguments)}.",
             )
         return callee.call(self, arguments)
 
     def visit_Get(self, node: expr.Get):
-
         object = self.evaluate(node.object)
         if not isinstance(object, LoxInstance):
             raise RuntimeError(node.name, "Only instances have properties.")
@@ -222,27 +221,23 @@ class Interpreter:
         return value
 
     def visit_Index(self, node: expr.Index):
-        from plox.native_functions.native_array import LoxArray
-
         obj = self.evaluate(node.object)
         index = self.evaluate(node.index)
 
-        if isinstance(obj, LoxArray):
+        if hasattr(obj, "get_index") and callable(getattr(obj, "get_index")):
             return obj.get_index(node.bracket, index)
 
-        raise RuntimeError(node.bracket, "Only arrays support indexing.")
+        raise RuntimeError(node.object, "Doesn't support indexing.")
 
     def visit_IndexAssign(self, node: expr.IndexAssign):
-        from plox.native_functions.native_array import LoxArray
-
         obj = self.evaluate(node.object)
         index = self.evaluate(node.index)
         value = self.evaluate(node.value)
 
-        if isinstance(obj, LoxArray):
+        if hasattr(obj, "set_index") and callable(getattr(obj, "set_index")):
             return obj.set_index(node.bracket, index, value)
 
-        raise RuntimeError(node.bracket, "Only arrays support indexing.")
+        raise RuntimeError(node.object, "Doesn't support indexing.")
 
     # Statement visitors
     def visit_Expression(self, node: stmt.Expression) -> None:

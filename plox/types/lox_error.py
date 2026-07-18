@@ -1,30 +1,37 @@
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, Union
 
-if TYPE_CHECKING:
-    from plox.types.lox_token import Token
+from plox.ast_printer import AstPrinter
+from plox.types import expr
+from plox.types.lox_token import Token
 
 
 class LoxError(ABC, Exception):
-    def __init__(self, token: Optional["Token"], message: str):
-        self.token = token
+    def __init__(self, node: Optional[Union["Token", "expr.Expr"]], message: str):
+        self.node = node
         self.message = message
 
     def __str__(self):
-        if self.token is None:
+        if self.node:
+            if isinstance(self.node, Token):
+                return f"Line {self.node.line} On '{self.node.lexeme}' Error: {self.message}"
+            if isinstance(self.node, expr.Expr):
+                return f"Error on {AstPrinter().visit(self.node)}: {self.message}"
+        else:
             return f"Error: {self.message}"
-        return f"Line {self.token.line} On '{self.token.lexeme}' Error: {self.message}"
 
 
 class RuntimeError(LoxError):
-    def __init__(self, token: Optional["Token"], message: str) -> None:
-        self.token: Optional["Token"] = token
+    def __init__(
+        self, node: Optional[Union["Token", "expr.Expr"]], message: str
+    ) -> None:
+        super().__init__(node, message)
         self.message: str = message
-        super().__init__(token, message)
 
 
 class StaticError(LoxError):
-    def __init__(self, token: Optional["Token"], message: str) -> None:
-        self.token: Optional["Token"] = token
+    def __init__(
+        self, node: Optional[Union["Token", "expr.Expr"]], message: str
+    ) -> None:
+        super().__init__(node, message)
         self.message: str = message
-        super().__init__(token, message)

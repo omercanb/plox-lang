@@ -7,7 +7,7 @@ if TYPE_CHECKING:
     from plox.interpreter import Interpreter
 
 
-class NativeAssert(LoxCallable):
+class BuiltinAssert(LoxCallable):
     def arity(self) -> int:
         return 1
 
@@ -18,4 +18,4 @@ class NativeAssert(LoxCallable):
         return None
 
     def __str__(self):
-        return "<native fn assert>"
+        return "<builtin assert>"
