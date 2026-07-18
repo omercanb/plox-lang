@@ -240,6 +240,8 @@ class Parser:
                 return exprs.Assign(expr.name, value)
             elif isinstance(expr, exprs.Get):
                 return exprs.Set(expr.object, expr.name, value)
+            elif isinstance(expr, exprs.Index):
+                return exprs.IndexAssign(expr.object, expr.bracket, expr.index, value)
             self.error(equals, "Invalid assignment target.")
 
         return expr
@@ -314,6 +316,11 @@ class Parser:
                     TokenType.IDENTIFIER, "Expected identifier after '.'."
                 )
                 expr = exprs.Get(expr, property)
+            elif self.match(TokenType.LEFT_BRACKET):
+                bracket = self.previous()
+                index = self.expression()
+                self.consume(TokenType.RIGHT_BRACKET, "Expect ']' after index.")
+                expr = exprs.Index(expr, bracket, index)
             else:
                 break
         return expr

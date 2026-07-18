@@ -216,6 +216,12 @@ class Interpreter:
         object.set(node.name, value)
         return value
 
+    def visit_Index(self, node: expr.Index):
+        raise RuntimeError(node.bracket, "Indexing not yet implemented.")
+
+    def visit_IndexAssign(self, node: expr.IndexAssign):
+        raise RuntimeError(node.bracket, "Index assignment not yet implemented.")
+
     # Statement visitors
     def visit_Expression(self, node: stmt.Expression) -> None:
         self.evaluate(node.expr)

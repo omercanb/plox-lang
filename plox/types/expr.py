@@ -87,3 +87,18 @@ class Set(Expr):
 class Lambda(Expr):
     params: List["Token"]
     body: "Expr"
+
+
+@dataclass(eq=False)
+class Index(Expr):
+    object: Expr
+    bracket: "Token"
+    index: Expr
+
+
+@dataclass(eq=False)
+class IndexAssign(Expr):
+    object: Expr
+    bracket: "Token"
+    index: Expr
+    value: Expr

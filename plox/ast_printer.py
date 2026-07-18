@@ -72,6 +72,12 @@ class AstPrinter:
     def visit_Set(self, node: expr.Set):
         return f"({self.visit(node.object)}.{self.visit(node.name)} = {self.visit(node.value)})"
 
+    def visit_Index(self, node: expr.Index):
+        return f"({self.visit(node.object)}[{self.visit(node.index)}])"
+
+    def visit_IndexAssign(self, node: expr.IndexAssign):
+        return f"({self.visit(node.object)}[{self.visit(node.index)}] = {self.visit(node.value)})"
+
     # Statement visitors
     def visit_Expression(self, node: stmt.Expression) -> str:
         return self.visit(node.expr)
