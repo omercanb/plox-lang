@@ -1,5 +1,4 @@
 var arr = array()
-arr[2]
 assert(arr.length() == 0)
 
 arr.append(10)

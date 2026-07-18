@@ -85,12 +85,9 @@ class InsertMethod(NativeArrayMethod):
 
     def call(self, interpreter: "Interpreter", arguments: List[Any]) -> Any:
         index, value = arguments
-        if not isinstance(index, (int, float)):
-            raise RuntimeError(None, "Index must be a number.")
-        index = int(index)
-        if index < 0 or index > len(self.array.elements):
-            raise RuntimeError(None, f"Index {index} out of bounds.")
-        self.array.elements.insert(index, value)
+        idx = self.array._validate_index_type(index)
+        self.array._check_insert_bounds(idx)
+        self.array.elements.insert(idx, value)
         return None
 
     def __str__(self):
@@ -106,7 +103,7 @@ class IndexMethod(NativeArrayMethod):
         try:
             return self.array.elements.index(value)
         except ValueError:
-            raise RuntimeError(None, "Element not found in array.")
+            return -1
 
     def __str__(self):
         return "<array method index>"
@@ -167,12 +164,9 @@ class RemoveAtMethod(NativeArrayMethod):
 
     def call(self, interpreter: "Interpreter", arguments: List[Any]) -> Any:
         index = arguments[0]
-        if not isinstance(index, (int, float)):
-            raise RuntimeError(None, "Index must be a number.")
-        index = int(index)
-        if index < 0 or index >= len(self.array.elements):
-            raise RuntimeError(None, f"Index {index} out of bounds.")
-        return self.array.elements.pop(index)
+        idx = self.array._validate_index_type(index)
+        self.array._check_read_bounds(idx)
+        return self.array.elements.pop(idx)
 
     def __str__(self):
         return "<array method remove_at>"
@@ -204,6 +198,22 @@ class LoxArray(LoxInstance):
     def is_truthy(self) -> bool:
         return len(self.elements) > 0
 
+    def _validate_index_type(self, index: Any) -> int:
+        """Convert index to int, raise if not a number."""
+        if not isinstance(index, (int, float)):
+            raise RuntimeError(None, "Array index must be a number.")
+        return int(index)
+
+    def _check_read_bounds(self, index: int) -> None:
+        """Check if index is valid for reading (0 <= index < len)."""
+        if index < 0 or index >= len(self.elements):
+            raise RuntimeError(None, f"Index {index} out of bounds.")
+
+    def _check_insert_bounds(self, index: int) -> None:
+        """Check if index is valid for inserting (0 <= index <= len)."""
+        if index < 0 or index > len(self.elements):
+            raise RuntimeError(None, f"Index {index} out of bounds.")
+
     def get(self, name: Token) -> Any:
         methods = {
             "append": AppendMethod,
@@ -224,20 +234,14 @@ class LoxArray(LoxInstance):
         raise RuntimeError(name, f"Array has no method '{name.lexeme}'.")
 
     def get_index(self, token: Token, index: Any) -> Any:
-        if not isinstance(index, (int, float)):
-            raise RuntimeError(token, "Array index must be a number.")
-        index = int(index)
-        if index < 0 or index >= len(self.elements):
-            raise RuntimeError(token, f"Index {index} out of bounds.")
-        return self.elements[index]
+        idx = self._validate_index_type(index)
+        self._check_read_bounds(idx)
+        return self.elements[idx]
 
     def set_index(self, token: Token, index: Any, value: Any) -> Any:
-        if not isinstance(index, (int, float)):
-            raise RuntimeError(token, "Array index must be a number.")
-        index = int(index)
-        if index < 0 or index >= len(self.elements):
-            raise RuntimeError(token, f"Index {index} out of bounds.")
-        self.elements[index] = value
+        idx = self._validate_index_type(index)
+        self._check_read_bounds(idx)
+        self.elements[idx] = value
         return value
 
     def __str__(self):
