@@ -95,7 +95,11 @@ class AstPrinter:
         )
 
     def visit_Class(self, node: stmt.Class):
-        return f"(class node.name.lexeme)"
+        s = f"(class {node.name.lexeme} (methods "
+        for method in node.methods:
+            s += self.visit(method)
+        s += ")"
+        return s
 
     def visit_Return(self, node: stmt.Return) -> str:
         return self.parenthesize("return", node.value)

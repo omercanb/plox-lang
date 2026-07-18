@@ -48,6 +48,7 @@ class FunctionType(Enum):
     function = auto()
     lmbda = auto()
     method = auto()
+    initializer = auto()
 
 
 class ClassType(Enum):
@@ -141,7 +142,10 @@ class ScopeResolver:
         # Step over the define function because that is for language users
         self.scope.bindings["this"] = True
         for method in node.methods:
-            self.resolve_function(method, FunctionType.method)
+            function_type = FunctionType.function
+            if method.name.lexeme == "init":
+                function_type = FunctionType.initializer
+            self.resolve_function(method, function_type)
         self.pop_scope()
         self.current_class = enclosing_class
 
@@ -175,4 +179,7 @@ class ScopeResolver:
             raise StaticError(
                 node.keyword, "'return' can only be used inside of a function."
             )
+        if self.current_function == FunctionType.initializer and node.value is not None:
+            raise StaticError(node.keyword, "Can't return from an initialzer.")
+
         self.visit(node.value)

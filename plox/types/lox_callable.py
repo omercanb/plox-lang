@@ -25,9 +25,12 @@ class LoxCallable(ABC):
 
 
 class LoxFunction(LoxCallable):
-    def __init__(self, declaration: "Function", closure: Environment) -> None:
+    def __init__(
+        self, declaration: "Function", closure: Environment, is_initializer
+    ) -> None:
         self.declaration: "Function" = declaration
         self.closure: Environment = closure
+        self.is_initializer = is_initializer
 
     def arity(self) -> int:
         return len(self.declaration.params)
@@ -39,16 +42,20 @@ class LoxFunction(LoxCallable):
         try:
             interpreter.execute_block(self.declaration.body, environment)
         except ReturnException as e:
+            if self.is_initializer:
+                return self.closure.values["this"]
             return e.value
 
         # Function had no return value
+        if self.is_initializer:
+            return self.closure.values["this"]
         return None
 
-    def bind(self, instance: "LoxClass"):
+    def bind(self, instance: "LoxInstance"):
         """Used before calling a method to bind the name 'this' in the method to the instance in which it was called on"""
         environment = Environment(self.closure)
         environment.define("this", instance)
-        method = LoxFunction(self.declaration, environment)
+        method = LoxFunction(self.declaration, environment, self.is_initializer)
         return method
 
     def __str__(self) -> str:
@@ -91,10 +98,19 @@ class LoxClass(LoxCallable):
         return f"<class {self.name.lexeme}>"
 
     def arity(self):
+        initializer = self.methods.get("init")
+        if initializer:
+            return initializer.arity()
         return 0
 
     def call(self, interpreter, arguments):
-        return LoxInstance(self)
+        instance = LoxInstance(self)
+        initializer = self.methods.get("init")
+        if initializer:
+            instance = initializer.bind(instance).call(interpreter, arguments)
+            assert isinstance(instance, LoxInstance)
+            return instance
+        return instance
 
 
 class LoxInstance:

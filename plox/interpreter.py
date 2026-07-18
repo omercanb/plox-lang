@@ -49,8 +49,6 @@ class Interpreter:
         except RuntimeError as error:
             from plox import plox
 
-            print(self.environment.values)
-
             plox.runtime_error(error)
 
     def execute(self, statement: stmt.Stmt) -> None:
@@ -81,7 +79,7 @@ class Interpreter:
     def visit_Assign(self, node: expr.Assign) -> Any:
         value = self.evaluate(node.value)
         distance = self.locals.get(node.name)
-        if distance:
+        if distance is not None:
             self.environment.assign_at(node.name, value, self.locals[node.name])
         else:
             self.globals.assign(node.name, value)
@@ -239,14 +237,15 @@ class Interpreter:
         self.environment.define(node.name.lexeme, None)
         methods: Dict[str, LoxFunction] = {}
         for method in node.methods:
-            function = LoxFunction(method, self.environment)
+            is_initializer = method.name.lexeme == "init"
+            function = LoxFunction(method, self.environment, is_initializer)
             methods[method.name.lexeme] = function
         cls = LoxClass(node.name, methods)
         self.environment.assign(node.name, cls)
         pass
 
     def visit_Function(self, node: stmt.Function) -> None:
-        function = LoxFunction(node, self.environment)
+        function = LoxFunction(node, self.environment, is_initializer=False)
         self.environment.define(node.name.lexeme, function)
 
     def visit_Return(self, node: stmt.Return) -> None:
@@ -262,9 +261,7 @@ class Interpreter:
         raise ContinueException()
 
     def visit_Block(self, node: stmt.Block) -> None:
-        self.push_environment()
         self.execute_block(node.statements, Environment(self.environment))
-        self.pop_environment()
 
     # Helpers
     def is_truthy(self, value: Any) -> bool:

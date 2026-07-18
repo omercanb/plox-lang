@@ -3,7 +3,8 @@ class Hello {
         print("Heyyo")
     }
 }
-h = Hello()
+print("Fields")
+var h = Hello()
 h.hi = "HI"
 h.hello = Hello()
 h.hello.hi = "HELLO"
@@ -11,24 +12,48 @@ print(h.hi)
 print(h.hello.hi)
 h.hello.hello = Hello()
 
-b = h.sayit
+print("")
+print("Basic Methods")
+var b = h.sayit
 b()
 
 class Thing {
   getCallback() {
+
     fun localFunction() {
       print(this.name);
     }
+    print(this.name)
 
     return localFunction;
   }
 }
 
+print("")
+print("Bound Methods")
 var thing = Thing()
 thing.name = "HotDog"
 var callback = thing.getCallback();
+print(callback)
 callback();
 
 thing.name = "Soup"
 callback()
+
+class Initialized {
+    init(name) {
+        this.name = name
+        if (name == "Burger") {
+            this.name = "Hamburger"
+            return
+        }
+        print(this.name)
+    }
+}
+
+print("")
+print("Initializers")
+var burger = Initialized("Burger")
+var pizza = Initialized("Pizza")
+print(burger.name)
 
