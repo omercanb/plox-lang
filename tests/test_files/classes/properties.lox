@@ -1,0 +1,10 @@
+class Cube {}
+
+var cube = Cube()
+cube.width = 10
+cube.height = 20
+cube.depth = 30
+
+print(cube.width)
+print(cube.height)
+print(cube.depth)

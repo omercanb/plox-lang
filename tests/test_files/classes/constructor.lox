@@ -1,0 +1,32 @@
+class Person {
+  init(name) {
+    this.name = name
+  }
+
+  greet() {
+    print("Hello, " + this.name + "!")
+  }
+}
+
+var jane = Person("Jane")
+jane.greet()
+
+var john = Person("John")
+john.greet()
+
+class Foo {
+  init(special) {
+    this.special = special
+    if (special) {
+      return
+    }
+    this.normal = "always set"
+  }
+}
+
+var foo1 = Foo(true)
+print(foo1.special)
+
+var foo2 = Foo(false)
+print(foo2.special)
+print(foo2.normal)

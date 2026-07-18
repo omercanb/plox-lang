@@ -1,4 +1,3 @@
-from pprint import pprint
 from typing import List, Optional
 
 from plox.types import expr as exprs
@@ -325,7 +324,6 @@ class Parser:
             expr = self.expression()
             self.consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.")
             return exprs.Grouping(expr)
-        pprint(self.tokens)
         raise self.error(self.peek(), "Expect expression.")
 
     def match(self, *types: TokenType) -> bool:

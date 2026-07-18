@@ -1,6 +1,7 @@
-import subprocess
 import glob
 import os
+import subprocess
+
 import pytest
 
 
@@ -15,9 +16,7 @@ def get_lox_files():
 def test_lox_file(lox_file, snapshot):
     """Test a lox file by comparing output against snapshot"""
     result = subprocess.run(
-        ["python", "-m", "plox", "--print", lox_file],
-        capture_output=True,
-        text=True
+        ["python", "-m", "plox", lox_file], capture_output=True, text=True
     )
     output = result.stderr + result.stdout
     assert output == snapshot

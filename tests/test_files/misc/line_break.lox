@@ -13,10 +13,10 @@ b)
 foo("a",
 "b")
 
-fun boo(a) {
+fun bar(a) {
     return 
     a
 }
 
-print(boo("hoo"))
+print(bar("hoo"))
 
