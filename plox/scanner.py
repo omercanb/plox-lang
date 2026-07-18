@@ -1,8 +1,8 @@
 from typing import Any, Dict, List
 
+from plox.semicolon_inference import SemicolonInference
 from plox.types.lox_token import Token
 from plox.types.token_type import TokenType
-from plox.semicolon_inference import SemicolonInference
 
 
 class Scanner:
@@ -102,8 +102,11 @@ class Scanner:
             pass
         elif c == "\n":
             # Semicolon inference: check if we should add semicolon before newline
-            if self.tokens and self.semicolon_inference.should_add_semicolon_before_newline(
-                self.tokens[-1].token_type
+            if (
+                self.tokens
+                and self.semicolon_inference.should_add_semicolon_before_newline(
+                    self.tokens[-1].token_type
+                )
             ):
                 self.add_token(TokenType.SEMICOLON)
             self.line += 1
@@ -148,6 +151,7 @@ class Scanner:
             return
         self.advance()
         value = self.source[self.start + 1 : self.current - 1]
+        value = eval(f'"{value}"')
         self.add_token(TokenType.STRING, value)
 
     def match(self, expected: str) -> bool:

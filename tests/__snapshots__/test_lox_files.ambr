@@ -230,6 +230,14 @@
   
   '''
 # ---
+# name: test_lox_file[strings.lox]
+  '''
+  hello
+  world
+  hello	world
+  
+  '''
+# ---
 # name: test_lox_file[this_binding.lox]
   '''
   The German chocolate cake is delicious!
