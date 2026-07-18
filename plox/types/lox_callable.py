@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, List
 
+from plox.types import stmt
 from plox.types.control_flow import ReturnException
 from plox.types.environment import Environment
 from plox.types.lox_token import Token
@@ -72,3 +73,34 @@ class LoxLambda(LoxCallable):
 
     def __str__(self) -> str:
         return f"<lambda>"
+
+
+class LoxClass(LoxCallable):
+    def __init__(self, node: stmt.Class):
+        self.name = node.name
+        self.methods = node.methods
+
+    def __str__(self):
+        return f"<class {self.name.lexeme}>"
+
+    def arity(self):
+        return 0
+
+    def call(self, interpreter, arguments):
+        return LoxInstance(self)
+
+
+class LoxInstance:
+    def __init__(self, cls: LoxClass):
+        self.cls = cls
+        self.fields = {}
+
+    def get(self, name: Token):
+        if name.lexeme not in self.fields:
+            raise RuntimeError(f"Undefined property {name.lexeme} on '{str(self)}'")
+
+    def set(self, name: Token, value):
+        self.fields[name.lexeme] = value
+
+    def __str__(self):
+        return f"<instance {self.cls.name.lexeme}>"

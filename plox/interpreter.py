@@ -6,7 +6,13 @@ from plox.types import expr as expr_module
 from plox.types import stmt as stmt_module
 from plox.types.control_flow import BreakException, ContinueException, ReturnException
 from plox.types.environment import Environment
-from plox.types.lox_callable import LoxCallable, LoxFunction, LoxLambda
+from plox.types.lox_callable import (
+    LoxCallable,
+    LoxClass,
+    LoxFunction,
+    LoxInstance,
+    LoxLambda,
+)
 from plox.types.lox_error import RuntimeError
 from plox.types.lox_token import Token
 from plox.types.token_type import TokenType
@@ -89,7 +95,11 @@ class Interpreter:
     # Expression visitors
     def visit_Assign(self, node: expr_module.Assign) -> Any:
         value = self.evaluate(node.value)
-        self.environment.assign_at(node.name, value, self.locals[node.name])
+        distance = self.locals.get(node.name)
+        if distance:
+            self.environment.assign_at(node.name, value, self.locals[node.name])
+        else:
+            self.globals.assign(node.name, value)
         return value
 
     def visit_Binary(self, node: expr_module.Binary) -> Any:
@@ -182,13 +192,15 @@ class Interpreter:
             )
         return callee.call(self, arguments)
 
+    def visit_Get(self, node: expr_module.Get):
+        object = self.evaluate(node.object)
+        if not isinstance(object, LoxInstance):
+            raise RuntimeError(node.name, "Only instances have properties.")
+        return object.get(node.name)
+
     # Statement visitors
     def visit_Expression(self, node: stmt_module.Expression) -> None:
         self.evaluate(node.expr)
-
-    def visit_Print(self, node: stmt_module.Print) -> None:
-        value: Any = self.evaluate(node.expr)
-        print(self.stringify(value))
 
     def visit_Var(self, node: stmt_module.Var) -> None:
         value: Any = None
@@ -225,6 +237,13 @@ class Interpreter:
             if node.increment is not None:
                 self.evaluate(node.increment)
         self.pop_environment()
+
+    def visit_Class(self, node: stmt_module.Class):
+        # First declare the class name so it can be referenced inside the class
+        self.environment.define(node.name.lexeme, None)
+        cls = LoxClass(node)
+        self.environment.assign(node.name, cls)
+        pass
 
     def visit_Function(self, node: stmt_module.Function) -> None:
         function = LoxFunction(node, self.environment)

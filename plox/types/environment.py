@@ -27,6 +27,9 @@ class Environment:
         else:
             self.enclosing.assign_at(name, value, distance - 1)
 
+    def assign(self, name: Token, value):
+        self.values[name.lexeme] = value
+
     # def get(self, name: "Token") -> Any:
     #     if name.lexeme in self.values:
     #         return self.values[name.lexeme]

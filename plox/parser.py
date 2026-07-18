@@ -27,6 +27,8 @@ class Parser:
 
     def declaration(self) -> Optional[stmt_module.Stmt]:
         try:
+            if self.match(TokenType.CLASS):
+                return self.class_declaration()
             if self.match(TokenType.FUN):
                 return self.function("function")
             if self.match(TokenType.VAR):
@@ -35,6 +37,15 @@ class Parser:
         except ParseError:
             self.synchronize()
             return None
+
+    def class_declaration(self):
+        name = self.consume(TokenType.IDENTIFIER, "Expect class name.")
+        self.consume(TokenType.LEFT_BRACE, "Expect '{' before class body.")
+        methods = []
+        while not self.check(TokenType.RIGHT_BRACE) and not self.is_at_end():
+            methods.append(self.function("method"))
+        self.consume(TokenType.RIGHT_BRACE, "Expect '}' after class body.")
+        return stmt_module.Class(name, methods)
 
     # kind is used to distinguish functions, methods, and lambdas
     def function(self, kind: str) -> stmt_module.Function | expr_module.LambdaFunction:
@@ -273,6 +284,11 @@ class Parser:
         while True:
             if self.match(TokenType.LEFT_PAREN):
                 expr = self.finish_call(expr)
+            elif self.match(TokenType.DOT):
+                property = self.consume(
+                    TokenType.IDENTIFIER, "Expected identifier after '.'."
+                )
+                expr = expr_module.Get(expr, property)
             else:
                 break
         return expr

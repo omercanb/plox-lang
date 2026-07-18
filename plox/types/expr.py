@@ -1,9 +1,9 @@
 from dataclasses import dataclass
-from typing import Any, List, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, List
 
 if TYPE_CHECKING:
-    from plox.types.lox_token import Token
     import plox.types.stmt as stmt
+    from plox.types.lox_token import Token
 
 
 @dataclass(eq=False)
@@ -57,6 +57,12 @@ class Call(Expr):
     callee: Expr
     paren: "Token"
     arguments: List[Expr]
+
+
+@dataclass(eq=False)
+class Get(Expr):
+    object: Expr
+    name: "Token"
 
 
 @dataclass(eq=False)

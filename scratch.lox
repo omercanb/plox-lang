@@ -1,0 +1,13 @@
+
+class Hello { 
+}
+
+print(Hello)
+print(Hello())
+
+fun main() {
+}
+
+a = 2
+main()
+print(a)

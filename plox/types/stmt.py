@@ -17,11 +17,6 @@ class Expression(Stmt):
 
 
 @dataclass(eq=False)
-class Print(Stmt):
-    expr: "Expr"
-
-
-@dataclass(eq=False)
 class Var(Stmt):
     name: "Token"
     initializer: Optional["Expr"]
@@ -46,6 +41,12 @@ class For(Stmt):
     condition: Optional["Expr"]
     increment: Optional["Expr"]
     body: Stmt
+
+
+@dataclass(eq=False)
+class Class(Stmt):
+    name: "Token"
+    methods: List["Function"]
 
 
 @dataclass(eq=False)

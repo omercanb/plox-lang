@@ -50,9 +50,6 @@ class AstPrinter:
     def visit_Expression(self, node: stmt_module.Expression) -> str:
         return self.visit(node.expr)
 
-    def visit_Print(self, node: stmt_module.Print) -> str:
-        return self.parenthesize("print", node.expr)
-
     def visit_Var(self, node: stmt_module.Var) -> str:
         if node.initializer is None:
             return f"(var {node.name.lexeme})"
@@ -83,6 +80,9 @@ class AstPrinter:
             + self.parenthesize("body", *node.body)
             + ")"
         )
+
+    def visit_Class(self, node: stmt_module.Class):
+        return f"(class node.name.lexeme)"
 
     def visit_Return(self, node: stmt_module.Return) -> str:
         return self.parenthesize("return", node.value)
