@@ -1,4 +1,7 @@
 class Hello { 
+    sayit() {
+        print("Heyyo")
+    }
 }
 h = Hello()
 h.hi = "HI"
@@ -7,3 +10,6 @@ h.hello.hi = "HELLO"
 print(h.hi)
 print(h.hello.hi)
 h.hello.hello = Hello()
+
+b = h.sayit
+b()

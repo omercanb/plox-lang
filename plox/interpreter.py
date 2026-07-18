@@ -1,7 +1,8 @@
-from typing import Any, List
+from typing import Any, Dict, List
 
 from plox.native_functions.native_clock import NativeClock
 from plox.native_functions.native_print import NativePrint
+from plox.types import environment
 from plox.types import expr as expr_module
 from plox.types import stmt as stmt_module
 from plox.types.control_flow import BreakException, ContinueException, ReturnException
@@ -236,7 +237,11 @@ class Interpreter:
     def visit_Class(self, node: stmt_module.Class):
         # First declare the class name so it can be referenced inside the class
         self.environment.define(node.name.lexeme, None)
-        cls = LoxClass(node)
+        methods: Dict[str, LoxFunction] = {}
+        for method in node.methods:
+            function = LoxFunction(method, self.environment)
+            methods[method.name.lexeme] = function
+        cls = LoxClass(node.name, methods)
         self.environment.assign(node.name, cls)
         pass
 

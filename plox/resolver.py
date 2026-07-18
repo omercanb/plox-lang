@@ -91,6 +91,14 @@ class ScopeResolver:
         assert self.scope.enclosing is not None
         self.scope = self.scope.enclosing
 
+    def resolve_function(self, node: stmt.Function, function_type: str):
+        self.scope.declare_define(node.name)
+        self.push_scope()
+        for param in node.params:
+            self.scope.declare_define(param)
+        self.visit(node.body)
+        self.pop_scope()
+
     # Constructs that create a new scope
     def visit_Block(self, node: stmt.Block):
         self.push_scope()
@@ -108,14 +116,11 @@ class ScopeResolver:
 
     def visit_Class(self, node: stmt.Class):
         self.scope.declare_define(node.name)
+        for method in node.methods:
+            self.resolve_function(method, "method")
 
     def visit_Function(self, node: stmt.Function):
-        self.scope.declare_define(node.name)
-        self.push_scope()
-        for param in node.params:
-            self.scope.declare_define(param)
-        self.visit(node.body)
-        self.pop_scope()
+        self.resolve_function(node, "function")
 
     def visit_LambdaFunction(self, node: expr.LambdaFunction):
         self.push_scope()

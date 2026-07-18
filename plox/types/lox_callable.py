@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, List
+from typing import TYPE_CHECKING, Any, Dict, List
 
 from plox.types import stmt
 from plox.types.control_flow import ReturnException
@@ -76,9 +76,9 @@ class LoxLambda(LoxCallable):
 
 
 class LoxClass(LoxCallable):
-    def __init__(self, node: stmt.Class):
-        self.name = node.name
-        self.methods = node.methods
+    def __init__(self, name: Token, methods: Dict[str, LoxFunction]):
+        self.name = name
+        self.methods = methods
 
     def __str__(self):
         return f"<class {self.name.lexeme}>"
@@ -96,9 +96,12 @@ class LoxInstance:
         self.fields = {}
 
     def get(self, name: Token):
-        if name.lexeme not in self.fields:
-            raise RuntimeError(f"Undefined property {name.lexeme} on '{str(self)}'")
-        return self.fields[name.lexeme]
+        if name.lexeme in self.fields:
+            return self.fields[name.lexeme]
+        if name.lexeme in self.cls.methods:
+            return self.cls.methods[name.lexeme]
+        print(self.cls.methods)
+        raise RuntimeError(f"Undefined property {name.lexeme} on '{str(self)}'")
 
     def set(self, name: Token, value):
         self.fields[name.lexeme] = value
