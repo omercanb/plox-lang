@@ -235,13 +235,24 @@ class Interpreter:
     def visit_Class(self, node: stmt.Class):
         # First declare the class name so it can be referenced inside the class
         self.environment.define(node.name.lexeme, None)
+
+        if node.superclass:
+            superclass = self.evaluate(node.superclass)
+            if not isinstance(superclass, LoxClass):
+                raise RuntimeError(node.superclass.name, "Superclass must be a class.")
+        else:
+            superclass = None
+
         methods: Dict[str, LoxFunction] = {}
         for method in node.methods:
             is_initializer = method.name.lexeme == "init"
             function = LoxFunction(method, self.environment, is_initializer)
             methods[method.name.lexeme] = function
-        cls = LoxClass(node.name, methods)
+
+        cls = LoxClass(node.name, methods, superclass)
+
         self.environment.assign(node.name, cls)
+
         pass
 
     def visit_Function(self, node: stmt.Function) -> None:

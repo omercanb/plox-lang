@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, List, Optional
 
 if TYPE_CHECKING:
+    from plox.types import expr
     from plox.types.expr import Expr
     from plox.types.lox_token import Token
 
@@ -47,6 +48,7 @@ class For(Stmt):
 class Class(Stmt):
     name: "Token"
     methods: List["Function"]
+    superclass: Optional["expr.Variable"]
 
 
 @dataclass(eq=False)

@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, Dict, List
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 from plox.types import environment
 from plox.types.control_flow import ReturnException
@@ -90,9 +90,15 @@ class LoxLambda(LoxCallable):
 
 
 class LoxClass(LoxCallable):
-    def __init__(self, name: Token, methods: Dict[str, LoxFunction]):
+    def __init__(
+        self,
+        name: Token,
+        methods: Dict[str, LoxFunction],
+        superclass: Optional["LoxClass"],
+    ):
         self.name = name
         self.methods = methods
+        self.superclass = superclass
 
     def __str__(self):
         return f"<class {self.name.lexeme}>"

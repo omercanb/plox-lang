@@ -137,14 +137,26 @@ class ScopeResolver:
         enclosing_class = self.current_class
         self.current_class = ClassType.cls
         self.scope.declare_define(node.name)
+
+        if node.superclass:
+            self.visit(node.superclass)
+            if node.superclass.name.lexeme == node.name.lexeme:
+                raise StaticError(
+                    node.superclass.name, "A class can't inherit from itself."
+                )
+
         self.push_scope()
-        # Step over the define function because that is for language users
+
         self.scope.bindings["this"] = True
+
         for method in node.methods:
-            function_type = FunctionType.method
             if method.name.lexeme == "init":
                 function_type = FunctionType.initializer
+            else:
+                function_type = FunctionType.method
+
             self.resolve_function(method, function_type)
+
         self.pop_scope()
         self.current_class = enclosing_class
 

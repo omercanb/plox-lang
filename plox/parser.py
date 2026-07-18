@@ -39,12 +39,22 @@ class Parser:
 
     def class_declaration(self) -> stmts.Class:
         name = self.consume(TokenType.IDENTIFIER, "Expect class name.")
+
+        if self.match(TokenType.LESS):
+            self.consume(TokenType.IDENTIFIER, "Expected superclass name after '<'.")
+            # Cast a superclass identfier to a variable to make it easier to resolve later
+            superclass = exprs.Variable(self.previous())
+        else:
+            superclass = None
+
         self.consume(TokenType.LEFT_BRACE, "Expect '{' before class body.")
+
         methods = []
         while not self.check(TokenType.RIGHT_BRACE) and not self.is_at_end():
             methods.append(self.function("method"))
         self.consume(TokenType.RIGHT_BRACE, "Expect '}' after class body.")
-        return stmts.Class(name, methods)
+
+        return stmts.Class(name, methods, superclass)
 
     # kind is used to distinguish functions, methods, and lambdas
     def function(self, kind: str) -> "stmts.Function | exprs.LambdaFunction":
