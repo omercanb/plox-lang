@@ -316,10 +316,11 @@ class Parser:
             return expr_module.Literal(None)
         if self.match(TokenType.NUMBER, TokenType.STRING):
             return expr_module.Literal(self.previous().literal)
+        if self.match(TokenType.THIS):
+            return expr_module.This(self.previous())
         if self.match(TokenType.IDENTIFIER):
             return expr_module.Variable(self.previous())
         if self.match(TokenType.FUN):
-            print("match lambda")
             return self.function("lambda")
         if self.match(TokenType.LEFT_PAREN):
             expr = self.expression()

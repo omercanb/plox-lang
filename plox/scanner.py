@@ -16,6 +16,7 @@ class Scanner:
         "false": TokenType.FALSE,
         "for": TokenType.FOR,
         "class": TokenType.CLASS,
+        "this": TokenType.THIS,
         "fun": TokenType.FUN,
         "if": TokenType.IF,
         "nil": TokenType.NIL,

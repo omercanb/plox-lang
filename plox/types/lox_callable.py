@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, Dict, List
 
-from plox.types import stmt
+from plox.types import environment, stmt
 from plox.types.control_flow import ReturnException
 from plox.types.environment import Environment
 from plox.types.lox_token import Token
@@ -43,6 +43,13 @@ class LoxFunction(LoxCallable):
 
         # Function had no return value
         return None
+
+    def bind(self, instance: "LoxClass"):
+        """Used before calling a method to bind the name 'this' in the method to the instance in which it was called on"""
+        environment = Environment(self.closure)
+        environment.define("this", instance)
+        method = LoxFunction(self.declaration, environment)
+        return method
 
     def __str__(self) -> str:
         return f"<fn {self.declaration.name.lexeme}>"
@@ -99,7 +106,8 @@ class LoxInstance:
         if name.lexeme in self.fields:
             return self.fields[name.lexeme]
         if name.lexeme in self.cls.methods:
-            return self.cls.methods[name.lexeme]
+            method = self.cls.methods[name.lexeme]
+            return method.bind(self)
         print(self.cls.methods)
         raise RuntimeError(f"Undefined property {name.lexeme} on '{str(self)}'")
 

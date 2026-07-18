@@ -44,6 +44,7 @@ class TokenType(Enum):
     FALSE = auto()
     FOR = auto()
     CLASS = auto()
+    THIS = auto()
     FUN = auto()
     IF = auto()
     NIL = auto()

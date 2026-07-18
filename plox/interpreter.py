@@ -28,8 +28,7 @@ class Interpreter:
         # A mapping of variables to how many scopes up the variable was defined
         self.locals: dict[Token, int] = locals
 
-    def get_variable(self, node: expr_module.Variable):
-        name = node.name
+    def get_variable(self, name: Token):
         if name in self.locals:
             distance = self.locals[name]
             return self.environment.get_at(name, distance)
@@ -162,7 +161,10 @@ class Interpreter:
         return node.value
 
     def visit_Variable(self, node: expr_module.Variable) -> Any:
-        return self.get_variable(node)
+        return self.get_variable(node.name)
+
+    def visit_This(self, node: expr_module.This):
+        return self.get_variable(node.keyword)
 
     def visit_LambdaFunction(self, node: expr_module.LambdaFunction):
         function = LoxLambda(node.params, node.body, self.environment)

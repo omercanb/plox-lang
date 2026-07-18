@@ -49,7 +49,7 @@ class ScopeResolver:
     # The distance to the enclosing scope in which the variable was defined
     locals: dict[Token, int] = dataclasses.field(default_factory=dict)
 
-    def add_local(self, name: Token):
+    def resolve_local(self, name: Token):
         assert name not in self.locals
         result = self.scope.resolve(name)
         if result is not None:
@@ -116,8 +116,15 @@ class ScopeResolver:
 
     def visit_Class(self, node: stmt.Class):
         self.scope.declare_define(node.name)
+        self.push_scope()
+        # Step over the define function because that is for language users
+        self.scope.bindings["this"] = True
         for method in node.methods:
             self.resolve_function(method, "method")
+        self.pop_scope()
+
+    def visit_This(self, node: expr.This):
+        self.resolve_local(node.keyword)
 
     def visit_Function(self, node: stmt.Function):
         self.resolve_function(node, "function")
@@ -137,8 +144,8 @@ class ScopeResolver:
 
     # Consstructs that use a variable
     def visit_Variable(self, node: expr.Variable):
-        self.add_local(node.name)
+        self.resolve_local(node.name)
 
     def visit_Assign(self, node: expr.Assign):
         self.visit(node.value)
-        self.add_local(node.name)
+        self.resolve_local(node.name)

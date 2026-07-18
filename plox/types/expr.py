@@ -53,6 +53,11 @@ class Variable(Expr):
 
 
 @dataclass(eq=False)
+class This(Expr):
+    keyword: "Token"
+
+
+@dataclass(eq=False)
 class Call(Expr):
     callee: Expr
     paren: "Token"
