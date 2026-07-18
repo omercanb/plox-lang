@@ -1,7 +1,0 @@
-print("hello world");
-
-fun helloBruv(name) {
-    print("hello " + name + "! Oy bruv");
-}
-
-helloBruv("barın");

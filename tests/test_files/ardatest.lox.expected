@@ -1,5 +1,0 @@
-(call print hello world)
-(function helloBruv (params name) (body (call print (+ (+ hello  name) ! Oy bruv))))
-(call helloBruv barın)
-hello world
-hello barın! Oy bruv

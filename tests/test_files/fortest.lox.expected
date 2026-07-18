@@ -1,5 +1,0 @@
-(var a = 0.0)
-(for (< a 3.0) { (call print a) (assign a (+ a 1.0)) })
-0
-1
-2

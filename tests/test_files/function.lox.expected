@@ -1,5 +1,0 @@
-(function sayHi (params first last) (body (call print (+ (+ (+ (+ Hi,  first)  ) last) !))))
-(call sayHi Dear Reader)
-(call sayHi Hello WORLD)
-Hi, Dear Reader!
-Hi, Hello WORLD!
