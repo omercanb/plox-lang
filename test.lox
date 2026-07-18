@@ -1,0 +1,13 @@
+fun foo() { 
+    print("global foo")
+}
+
+class C {
+  foo() { 
+    print("method fooo") 
+  }
+  bar() {
+    foo()
+  }   // resolver: found in class scope, distance 1
+}                     // runtime: distance 1 = bind env = {"this": ...}, no "foo"
+C().bar()

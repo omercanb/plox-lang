@@ -17,7 +17,8 @@ class Scope:
     bindings: dict[str, bool] = dataclasses.field(default_factory=dict)
 
     def declare(self, name: Token):
-        assert name.lexeme not in self.bindings
+        if name.lexeme in self.bindings:
+            raise StaticError(name, "Name can't be declared more than once.")
         self.bindings[name.lexeme] = False
 
     # Distinct declare and defined allow us to raise undefined variable errors
@@ -66,7 +67,7 @@ class ScopeResolver:
     current_class: ClassType = ClassType.none
 
     def resolve_local(self, name: Token):
-        assert name not in self.locals
+        """Bind the name to the scope in which it was declared"""
         result = self.scope.resolve(name)
         if result is not None:
             distance = result
@@ -110,8 +111,6 @@ class ScopeResolver:
     def resolve_function(self, node: stmt.Function, function_type: FunctionType):
         enclosing_function = self.current_function
         self.current_function = function_type
-        if function_type != FunctionType.lmbda:
-            self.scope.declare_define(node.name)
         self.push_scope()
         for param in node.params:
             self.scope.declare_define(param)
@@ -142,7 +141,7 @@ class ScopeResolver:
         # Step over the define function because that is for language users
         self.scope.bindings["this"] = True
         for method in node.methods:
-            function_type = FunctionType.function
+            function_type = FunctionType.method
             if method.name.lexeme == "init":
                 function_type = FunctionType.initializer
             self.resolve_function(method, function_type)
@@ -155,6 +154,7 @@ class ScopeResolver:
         self.resolve_local(node.keyword)
 
     def visit_Function(self, node: stmt.Function):
+        self.scope.declare_define(node.name)
         self.resolve_function(node, FunctionType.function)
 
     def visit_LambdaFunction(self, node: expr.LambdaFunction):

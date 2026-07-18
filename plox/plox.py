@@ -83,7 +83,6 @@ def run(source: str) -> None:
 
     scope_resolver = ScopeResolver()
     scope_resolver.visit(statements)
-    pp(scope_resolver.locals)
 
     interpreter = Interpreter(scope_resolver.locals)
     interpreter.interpret(statements)

@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, Dict, List
 
-from plox.types import environment, stmt
+from plox.types import environment
 from plox.types.control_flow import ReturnException
 from plox.types.environment import Environment
 from plox.types.lox_token import Token
@@ -124,7 +124,6 @@ class LoxInstance:
         if name.lexeme in self.cls.methods:
             method = self.cls.methods[name.lexeme]
             return method.bind(self)
-        print(self.cls.methods)
         raise RuntimeError(f"Undefined property {name.lexeme} on '{str(self)}'")
 
     def set(self, name: Token, value):
