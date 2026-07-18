@@ -1,5 +1,6 @@
 import dataclasses
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from enum import Enum, auto
 
 import plox.types.expr as expr
 import plox.types.stmt as stmt
@@ -42,12 +43,26 @@ class Scope:
             return None
 
 
+class FunctionType(Enum):
+    none = auto()
+    function = auto()
+    lmbda = auto()
+    method = auto()
+
+
+class ClassType(Enum):
+    none = auto()
+    cls = auto()
+
+
 # Must keep track of definititons and variable usages
 @dataclass
 class ScopeResolver:
-    scope: Scope = dataclasses.field(default_factory=Scope)
+    scope: Scope = field(default_factory=Scope)
     # The distance to the enclosing scope in which the variable was defined
-    locals: dict[Token, int] = dataclasses.field(default_factory=dict)
+    locals: dict[Token, int] = field(default_factory=dict)
+    current_function: FunctionType = FunctionType.none
+    current_class: ClassType = ClassType.none
 
     def resolve_local(self, name: Token):
         assert name not in self.locals
@@ -91,13 +106,17 @@ class ScopeResolver:
         assert self.scope.enclosing is not None
         self.scope = self.scope.enclosing
 
-    def resolve_function(self, node: stmt.Function, function_type: str):
-        self.scope.declare_define(node.name)
+    def resolve_function(self, node: stmt.Function, function_type: FunctionType):
+        enclosing_function = self.current_function
+        self.current_function = function_type
+        if function_type != FunctionType.lmbda:
+            self.scope.declare_define(node.name)
         self.push_scope()
         for param in node.params:
             self.scope.declare_define(param)
         self.visit(node.body)
         self.pop_scope()
+        self.current_function = enclosing_function
 
     # Constructs that create a new scope
     def visit_Block(self, node: stmt.Block):
@@ -115,26 +134,27 @@ class ScopeResolver:
         self.pop_scope()
 
     def visit_Class(self, node: stmt.Class):
+        enclosing_class = self.current_class
+        self.current_class = ClassType.cls
         self.scope.declare_define(node.name)
         self.push_scope()
         # Step over the define function because that is for language users
         self.scope.bindings["this"] = True
         for method in node.methods:
-            self.resolve_function(method, "method")
+            self.resolve_function(method, FunctionType.method)
         self.pop_scope()
+        self.current_class = enclosing_class
 
     def visit_This(self, node: expr.This):
+        if self.current_class == ClassType.none:
+            raise StaticError(node.keyword, "'this' can only be used inside classes.")
         self.resolve_local(node.keyword)
 
     def visit_Function(self, node: stmt.Function):
-        self.resolve_function(node, "function")
+        self.resolve_function(node, FunctionType.function)
 
     def visit_LambdaFunction(self, node: expr.LambdaFunction):
-        self.push_scope()
-        for param in node.params:
-            self.scope.declare_define(param)
-        self.visit(node.body)
-        self.pop_scope()
+        self.resolve_function(node, FunctionType.lmbda)
 
     # Constructs that define a variable
     def visit_Var(self, node: stmt.Var):
@@ -149,3 +169,10 @@ class ScopeResolver:
     def visit_Assign(self, node: expr.Assign):
         self.visit(node.value)
         self.resolve_local(node.name)
+
+    def visit_Return(self, node: stmt.Return):
+        if self.current_function == FunctionType.none:
+            raise StaticError(
+                node.keyword, "'return' can only be used inside of a function."
+            )
+        self.visit(node.value)

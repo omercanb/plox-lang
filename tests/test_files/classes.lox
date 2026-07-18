@@ -1,0 +1,34 @@
+class Hello { 
+    sayit() {
+        print("Heyyo")
+    }
+}
+h = Hello()
+h.hi = "HI"
+h.hello = Hello()
+h.hello.hi = "HELLO"
+print(h.hi)
+print(h.hello.hi)
+h.hello.hello = Hello()
+
+b = h.sayit
+b()
+
+class Thing {
+  getCallback() {
+    fun localFunction() {
+      print(this.name);
+    }
+
+    return localFunction;
+  }
+}
+
+var thing = Thing()
+thing.name = "HotDog"
+var callback = thing.getCallback();
+callback();
+
+thing.name = "Soup"
+callback()
+

@@ -28,6 +28,8 @@ class Environment:
             self.enclosing.assign_at(name, value, distance - 1)
 
     def assign(self, name: Token, value):
+        if name.lexeme not in self.values:
+            raise RuntimeError(name, "Name not defined")
         self.values[name.lexeme] = value
 
     # def get(self, name: "Token") -> Any:

@@ -1,8 +1,7 @@
 from pprint import pprint
 from typing import List, Optional
 
-from plox.types import expr as expr_module
-from plox.types import stmt as stmt_module
+from plox.types import expr, stmt
 from plox.types.lox_token import Token
 from plox.types.token_type import TokenType
 
@@ -17,7 +16,7 @@ class Parser:
         self.current: int = 0
         self.current_loop_nesting_depth: int = 0
 
-    def parse(self) -> List[stmt_module.Stmt]:
+    def parse(self) -> List[stmt.Stmt]:
         statements = []
         while not self.is_at_end():
             stmt = self.declaration()
@@ -25,7 +24,7 @@ class Parser:
                 statements.append(stmt)
         return statements
 
-    def declaration(self) -> Optional[stmt_module.Stmt]:
+    def declaration(self) -> Optional[stmt.Stmt]:
         try:
             if self.match(TokenType.CLASS):
                 return self.class_declaration()
@@ -45,10 +44,10 @@ class Parser:
         while not self.check(TokenType.RIGHT_BRACE) and not self.is_at_end():
             methods.append(self.function("method"))
         self.consume(TokenType.RIGHT_BRACE, "Expect '}' after class body.")
-        return stmt_module.Class(name, methods)
+        return stmt.Class(name, methods)
 
     # kind is used to distinguish functions, methods, and lambdas
-    def function(self, kind: str) -> stmt_module.Function | expr_module.LambdaFunction:
+    def function(self, kind: str) -> stmt.Function | expr.LambdaFunction:
         if kind == "lambda":
             self.consume(TokenType.LEFT_PAREN, f"Expect '(' after {kind}.")
         else:
@@ -68,11 +67,11 @@ class Parser:
         self.consume(TokenType.LEFT_BRACE, f"Expect '{{' before {kind} body.")
         body = self.block()
         if kind == "lambda":
-            return expr_module.LambdaFunction(params, body)
+            return expr.LambdaFunction(params, body)
         else:
-            return stmt_module.Function(name, params, body)
+            return stmt.Function(name, params, body)
 
-    def return_(self) -> stmt_module.Return:
+    def return_(self) -> stmt.Return:
         keyword = self.previous()
         value = None
         if not self.check(TokenType.SEMICOLON):
@@ -80,9 +79,9 @@ class Parser:
             value = self.expression()
 
         self.consume(TokenType.SEMICOLON, "Expect newline after return value.")
-        return stmt_module.Return(keyword, value)
+        return stmt.Return(keyword, value)
 
-    def var_declaration(self, in_for=False) -> stmt_module.Var:
+    def var_declaration(self, in_for=False) -> stmt.Var:
         name = self.consume(TokenType.IDENTIFIER, "Expect variable name.")
         initializer = None
         if self.match(TokenType.EQUAL):
@@ -93,9 +92,9 @@ class Parser:
             self.consume(
                 TokenType.SEMICOLON, "Expect newline after variable declaration."
             )
-        return stmt_module.Var(name, initializer)
+        return stmt.Var(name, initializer)
 
-    def statement(self) -> stmt_module.Stmt:
+    def statement(self) -> stmt.Stmt:
         if self.match(TokenType.FOR):
             return self.for_statement()
         if self.match(TokenType.IF):
@@ -105,7 +104,7 @@ class Parser:
         if self.match(TokenType.WHILE):
             return self.while_statement()
         if self.match(TokenType.LEFT_BRACE):
-            return stmt_module.Block(self.block())
+            return stmt.Block(self.block())
         if self.match(TokenType.BREAK):
             return self.break_statement()
         if self.match(TokenType.CONTINUE):
@@ -136,7 +135,7 @@ class Parser:
         body = self.statement()
         self.current_loop_nesting_depth -= 1
 
-        return stmt_module.For(initializer, condition, increment, body)
+        return stmt.For(initializer, condition, increment, body)
 
     def if_statement(self):
         self.consume(TokenType.LEFT_PAREN, "Expect '(' after 'if'.")
@@ -148,7 +147,7 @@ class Parser:
         if self.match(TokenType.ELSE):
             else_branch = self.statement()
 
-        return stmt_module.If(condition, then_branch, else_branch)
+        return stmt.If(condition, then_branch, else_branch)
 
     def while_statement(self):
         self.consume(TokenType.LEFT_PAREN, "Expect '(' after 'while'.")
@@ -157,21 +156,21 @@ class Parser:
         self.current_loop_nesting_depth += 1
         body = self.statement()
         self.current_loop_nesting_depth -= 1
-        return stmt_module.While(condition, body)
+        return stmt.While(condition, body)
 
     def break_statement(self):
         if self.current_loop_nesting_depth == 0:
             self.error(self.previous(), "break not in loop.")
         self.consume(TokenType.SEMICOLON, "Expect newline after 'break'.")
-        return stmt_module.Break()
+        return stmt.Break()
 
     def continue_statement(self):
         if self.current_loop_nesting_depth == 0:
             self.error(self.previous(), "continue not in loop.")
         self.consume(TokenType.SEMICOLON, "Expect newline after 'continue'.")
-        return stmt_module.Continue()
+        return stmt.Continue()
 
-    def block(self) -> List[stmt_module.Stmt]:
+    def block(self) -> List[stmt.Stmt]:
         statements = []
         while not self.check(TokenType.RIGHT_BRACE) and not self.is_at_end():
             statements.append(self.declaration())
@@ -184,12 +183,12 @@ class Parser:
             self.consume(TokenType.SEMICOLON, "Expect ';' after expression.")
         else:
             self.consume(TokenType.SEMICOLON, "Expect newline after expression.")
-        return stmt_module.Expression(expr)
+        return stmt.Expression(expr)
 
-    def expression(self) -> expr_module.Expr:
+    def expression(self) -> expr.Expr:
         return self.assignment()
 
-    def assignment(self) -> expr_module.Expr:
+    def assignment(self) -> expr.Expr:
         COMPOUND_ASSIGN = {
             TokenType.PLUS_EQUAL: TokenType.PLUS,
             TokenType.MINUS_EQUAL: TokenType.MINUS,
@@ -203,49 +202,47 @@ class Parser:
             op_token = self.previous()
             base_type = COMPOUND_ASSIGN[op_token.token_type]
             value = self.assignment()
-            if isinstance(expr, expr_module.Variable):
+            if isinstance(expr, expr.Variable):
                 base_op = Token(base_type, op_token.lexeme[0], None, op_token.line)
-                return expr_module.Assign(
-                    expr.name, expr_module.Binary(expr, base_op, value)
-                )
+                return expr.Assign(expr.name, expr.Binary(expr, base_op, value))
             self.error(op_token, "Invalid assignment target.")
 
         if self.match(TokenType.EQUAL):
             equals = self.previous()
             value = self.assignment()
-            if isinstance(expr, expr_module.Variable):
-                return expr_module.Assign(expr.name, value)
-            elif isinstance(expr, expr_module.Get):
-                return expr_module.Set(expr.object, expr.name, value)
+            if isinstance(expr, expr.Variable):
+                return expr.Assign(expr.name, value)
+            elif isinstance(expr, expr.Get):
+                return expr.Set(expr.object, expr.name, value)
             self.error(equals, "Invalid assignment target.")
 
         return expr
 
-    def or_(self) -> expr_module.Expr:
+    def or_(self) -> expr.Expr:
         expr = self.and_()
         while self.match(TokenType.OR):
             op = self.previous()
             right = self.and_()
-            expr = expr_module.Logical(expr, op, right)
+            expr = expr.Logical(expr, op, right)
         return expr
 
-    def and_(self) -> expr_module.Expr:
+    def and_(self) -> expr.Expr:
         expr = self.equality()
         while self.match(TokenType.AND):
             op = self.previous()
             right = self.equality()
-            expr = expr_module.Logical(expr, op, right)
+            expr = expr.Logical(expr, op, right)
         return expr
 
-    def equality(self) -> expr_module.Expr:
+    def equality(self) -> expr.Expr:
         expr = self.comparison()
         while self.match(TokenType.BANG_EQUAL, TokenType.EQUAL_EQUAL):
             op = self.previous()
             right = self.comparison()
-            expr = expr_module.Binary(expr, op, right)
+            expr = expr.Binary(expr, op, right)
         return expr
 
-    def comparison(self) -> expr_module.Expr:
+    def comparison(self) -> expr.Expr:
         expr = self.term()
         while self.match(
             TokenType.GREATER,
@@ -255,33 +252,33 @@ class Parser:
         ):
             op = self.previous()
             right = self.term()
-            expr = expr_module.Binary(expr, op, right)
+            expr = expr.Binary(expr, op, right)
         return expr
 
-    def term(self) -> expr_module.Expr:
+    def term(self) -> expr.Expr:
         expr = self.factor()
         while self.match(TokenType.MINUS, TokenType.PLUS):
             op = self.previous()
             right = self.factor()
-            expr = expr_module.Binary(expr, op, right)
+            expr = expr.Binary(expr, op, right)
         return expr
 
-    def factor(self) -> expr_module.Expr:
+    def factor(self) -> expr.Expr:
         expr = self.unary()
         while self.match(TokenType.SLASH, TokenType.STAR, TokenType.MODULO):
             op = self.previous()
             right = self.unary()
-            expr = expr_module.Binary(expr, op, right)
+            expr = expr.Binary(expr, op, right)
         return expr
 
-    def unary(self) -> expr_module.Expr:
+    def unary(self) -> expr.Expr:
         if self.match(TokenType.BANG, TokenType.MINUS):
             op = self.previous()
             right = self.unary()
-            return expr_module.Unary(op, right)
+            return expr.Unary(op, right)
         return self.call()
 
-    def call(self) -> expr_module.Expr:
+    def call(self) -> expr.Expr:
         expr = self.primary()
         while True:
             if self.match(TokenType.LEFT_PAREN):
@@ -290,12 +287,12 @@ class Parser:
                 property = self.consume(
                     TokenType.IDENTIFIER, "Expected identifier after '.'."
                 )
-                expr = expr_module.Get(expr, property)
+                expr = expr.Get(expr, property)
             else:
                 break
         return expr
 
-    def finish_call(self, callee: expr_module.Expr) -> expr_module.Call:
+    def finish_call(self, callee: expr.Expr) -> expr.Call:
         arguments = []
         if not self.check(TokenType.RIGHT_PAREN):
             while True:
@@ -305,27 +302,27 @@ class Parser:
                 if not self.match(TokenType.COMMA):
                     break
         paren = self.consume(TokenType.RIGHT_PAREN, "Expect ')' after arguments.")
-        return expr_module.Call(callee, paren, arguments)
+        return expr.Call(callee, paren, arguments)
 
-    def primary(self) -> expr_module.Expr:
+    def primary(self) -> expr.Expr:
         if self.match(TokenType.FALSE):
-            return expr_module.Literal(False)
+            return expr.Literal(False)
         if self.match(TokenType.TRUE):
-            return expr_module.Literal(True)
+            return expr.Literal(True)
         if self.match(TokenType.NIL):
-            return expr_module.Literal(None)
+            return expr.Literal(None)
         if self.match(TokenType.NUMBER, TokenType.STRING):
-            return expr_module.Literal(self.previous().literal)
+            return expr.Literal(self.previous().literal)
         if self.match(TokenType.THIS):
-            return expr_module.This(self.previous())
+            return expr.This(self.previous())
         if self.match(TokenType.IDENTIFIER):
-            return expr_module.Variable(self.previous())
+            return expr.Variable(self.previous())
         if self.match(TokenType.FUN):
             return self.function("lambda")
         if self.match(TokenType.LEFT_PAREN):
             expr = self.expression()
             self.consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.")
-            return expr_module.Grouping(expr)
+            return expr.Grouping(expr)
         pprint(self.tokens)
         raise self.error(self.peek(), "Expect expression.")
 
