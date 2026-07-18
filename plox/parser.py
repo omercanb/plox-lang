@@ -215,6 +215,8 @@ class Parser:
             value = self.assignment()
             if isinstance(expr, expr_module.Variable):
                 return expr_module.Assign(expr.name, value)
+            elif isinstance(expr, expr_module.Get):
+                return expr_module.Set(expr.object, expr.name, value)
             self.error(equals, "Invalid assignment target.")
 
         return expr

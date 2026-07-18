@@ -98,6 +98,7 @@ class LoxInstance:
     def get(self, name: Token):
         if name.lexeme not in self.fields:
             raise RuntimeError(f"Undefined property {name.lexeme} on '{str(self)}'")
+        return self.fields[name.lexeme]
 
     def set(self, name: Token, value):
         self.fields[name.lexeme] = value

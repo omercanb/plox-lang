@@ -66,6 +66,13 @@ class Get(Expr):
 
 
 @dataclass(eq=False)
+class Set(Expr):
+    object: Expr
+    name: "Token"
+    value: Expr
+
+
+@dataclass(eq=False)
 class LambdaFunction(Expr):
     params: List["Token"]
     body: List["stmt.Stmt"]

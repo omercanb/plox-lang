@@ -52,9 +52,7 @@ class ScopeResolver:
     def add_local(self, name: Token):
         assert name not in self.locals
         result = self.scope.resolve(name)
-        print("Adding local", name)
         if result is not None:
-            print("Adding local", name)
             distance = result
             self.locals[name] = distance
 
@@ -110,9 +108,6 @@ class ScopeResolver:
 
     def visit_Class(self, node: stmt.Class):
         self.scope.declare_define(node.name)
-
-    def visit_Get(self, node: expr.Get):
-        self.visit(node.object)
 
     def visit_Function(self, node: stmt.Function):
         self.scope.declare_define(node.name)

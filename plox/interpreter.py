@@ -26,21 +26,8 @@ class Interpreter:
         self.globals.define("print", NativePrint())
         # A mapping of variables to how many scopes up the variable was defined
         self.locals: dict[Token, int] = locals
-        print("locals!")
-        print(self.locals)
-        print("globals")
-        print(self.globals)
 
     def get_variable(self, node: expr_module.Variable):
-        # print(node.name)
-        # if node.name in self.locals:
-        #     print(self.locals[node.name])
-        #
-        # print("local", self.environment.values)
-        # if self.environment.enclosing:
-        #     print("enclosing", self.environment.enclosing.values)
-        #     if self.environment.enclosing.enclosing:
-        #         print("double enclosing", self.environment.enclosing.enclosing.values)
         name = node.name
         if name in self.locals:
             distance = self.locals[name]
@@ -197,6 +184,14 @@ class Interpreter:
         if not isinstance(object, LoxInstance):
             raise RuntimeError(node.name, "Only instances have properties.")
         return object.get(node.name)
+
+    def visit_Set(self, node: expr_module.Set):
+        object = self.evaluate(node.object)
+        if not isinstance(object, LoxInstance):
+            raise RuntimeError(node.name, "Only instances have properties.")
+        value = self.evaluate(node.value)
+        object.set(node.name, value)
+        return value
 
     # Statement visitors
     def visit_Expression(self, node: stmt_module.Expression) -> None:

@@ -2,6 +2,7 @@ from typing import Any
 
 from plox.types import expr as expr_module
 from plox.types import stmt as stmt_module
+from plox.types.lox_token import Token
 
 
 class AstPrinter:
@@ -17,6 +18,9 @@ class AstPrinter:
         if method is None:
             raise NotImplementedError(f"No visitor for {type(node).__name__}")
         return method(node)
+
+    def visit_Token(self, node: Token):
+        return node.lexeme
 
     # Expression visitors
     def visit_Assign(self, node: expr_module.Assign) -> str:
@@ -45,6 +49,12 @@ class AstPrinter:
     def visit_Call(self, node: expr_module.Call) -> str:
         result = self.parenthesize("call", node.callee, *node.arguments)
         return result
+
+    def visit_Get(self, node: expr_module.Get):
+        return f"({self.visit(node.object)}.{self.visit(node.name)})"
+
+    def visit_Set(self, node: expr_module.Set):
+        return f"({self.visit(node.object)}.{self.visit(node.name)} = {self.visit(node.value)})"
 
     # Statement visitors
     def visit_Expression(self, node: stmt_module.Expression) -> str:

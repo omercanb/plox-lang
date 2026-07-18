@@ -1,13 +1,9 @@
-
 class Hello { 
 }
-
-print(Hello)
-print(Hello())
-
-fun main() {
-}
-
-a = 2
-main()
-print(a)
+h = Hello()
+h.hi = "HI"
+h.hello = Hello()
+h.hello.hi = "HELLO"
+print(h.hi)
+print(h.hello.hi)
+h.hello.hello = Hello()
