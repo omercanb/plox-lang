@@ -1,0 +1,77 @@
+var s = set()
+s.add(1)
+s.add(2)
+s.add(3)
+s.add(3)
+print(s)
+assert(s.length() == 3)
+assert(s.contains(1))
+assert(!s.contains(4))
+
+// remove errors on a missing element, discard does not
+s.remove(3)
+assert(!s.contains(3))
+assert(s.discard(99) == false)
+assert(s.discard(2) == true)
+assert(s.length() == 1)
+
+// mixed element types
+s.add("Foo")
+s.add(true)
+s.add(nil)
+print(s)
+assert(s.contains("Foo"))
+assert(s.contains(nil))
+
+// elements() gives an array so the set can be walked
+var els = s.elements()
+assert(els.length() == 3)
+print(els)
+
+// copy is independent of the original
+var a = set()
+a.add(1)
+a.add(2)
+var b = a.copy()
+b.add(3)
+print("a: " + a)
+print("b: " + b)
+assert(a.length() == 2)
+assert(b.length() == 3)
+
+// union mutates the receiver
+a.union(b)
+assert(a.length() == 3)
+assert(a.contains(3))
+
+// intersection keeps only shared elements
+var c = set()
+c.add(2)
+c.add(3)
+c.add(9)
+a.intersection(c)
+assert(a.length() == 2)
+assert(a.contains(2))
+assert(a.contains(3))
+assert(!a.contains(1))
+assert(!a.contains(9))
+
+// difference removes shared elements
+var d = set()
+d.add(3)
+a.difference(d)
+assert(a.length() == 1)
+assert(a.contains(2))
+
+// pop removes and returns some element
+var p = a.pop()
+assert(p == 2)
+assert(a.length() == 0)
+
+a.add(7)
+a.clear()
+assert(a.length() == 0)
+assert(!a.contains(7))
+
+print("set tests passed")
+

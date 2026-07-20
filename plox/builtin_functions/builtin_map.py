@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Any, Dict, List
 from plox.builtin_functions.builtin_array import LoxArray
 from plox.builtin_functions.builtin_classes import BuiltinClass
 from plox.builtin_functions.builtin_pair import LoxPair
-from plox.types.lox_callable import LoxBindable, LoxCallable, LoxInstance
+from plox.types.lox_callable import LoxBindableMethod, LoxCallable, LoxInstance
 from plox.types.lox_error import RuntimeError
 from plox.types.lox_token import Token
 from plox.types.token_type import TokenType
@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from plox.interpreter import Interpreter
 
 
-class BuiltinMapMethod(LoxBindable):
+class BuiltinMapMethod(LoxBindableMethod):
     """Base class for map methods"""
 
     map: "LoxMap"
@@ -25,30 +25,17 @@ class BuiltinMapMethod(LoxBindable):
 
 class GetMethod(BuiltinMapMethod):
     def arity(self):
-        return 2
+        return 1
 
     def call(self, interpreter: "Interpreter", arguments: List[Any]):
-        key, default = arguments
-        return self.map.entries.get(self.map._validate_key_type(key), default)
+        key = arguments[0]
+        return self.map.entries.get(self.map._validate_key_type(key))
 
     def __str__(self):
         return "<map method get>"
 
 
-class SetMethod(BuiltinMapMethod):
-    def arity(self):
-        return 2
-
-    def call(self, interpreter: "Interpreter", arguments: List[Any]):
-        key, value = arguments
-        self.map.entries[self.map._validate_key_type(key)] = value
-        return value
-
-    def __str__(self):
-        return "<map method set>"
-
-
-class HasMethod(BuiltinMapMethod):
+class ContainsMethod(BuiltinMapMethod):
     def arity(self):
         return 1
 
@@ -56,7 +43,7 @@ class HasMethod(BuiltinMapMethod):
         return self.map._validate_key_type(arguments[0]) in self.map.entries
 
     def __str__(self):
-        return "<map method has>"
+        return "<map method contains>"
 
 
 class RemoveMethod(BuiltinMapMethod):
@@ -144,9 +131,9 @@ class CopyMethod(BuiltinMapMethod):
 class BuiltinMap(BuiltinClass):
     def __init__(self):
         name = Token(TokenType.IDENTIFIER, "map", None, 0)
-        methods: dict[str, LoxBindable] = {
+        methods: dict[str, LoxBindableMethod] = {
             "get": GetMethod(),
-            "has": HasMethod(),
+            "contains": ContainsMethod(),
             "remove": RemoveMethod(),
             "length": LengthMethod(),
             "clear": ClearMethod(),

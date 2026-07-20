@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING, Any, List
 
 from plox.builtin_functions.builtin_classes import BuiltinClass
-from plox.types.lox_callable import LoxBindable, LoxCallable, LoxInstance
+from plox.types.lox_callable import LoxBindableMethod, LoxCallable, LoxInstance
 from plox.types.lox_error import RuntimeError
 from plox.types.lox_token import Token
 from plox.types.token_type import TokenType
@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from plox.interpreter import Interpreter
 
 
-class BuiltinArrayMethod(LoxBindable):
+class BuiltinArrayMethod(LoxBindableMethod):
     """Base class for array methods"""
 
     array: "LoxArray"

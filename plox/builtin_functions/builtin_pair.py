@@ -1,7 +1,12 @@
 from typing import TYPE_CHECKING, Any, List
 
 from plox.builtin_functions.builtin_classes import BuiltinClass
-from plox.types.lox_callable import LoxBindable, LoxCallable, LoxFunction, LoxInstance
+from plox.types.lox_callable import (
+    LoxBindableMethod,
+    LoxCallable,
+    LoxFunction,
+    LoxInstance,
+)
 from plox.types.lox_error import RuntimeError
 from plox.types.lox_token import Token
 from plox.types.token_type import TokenType
@@ -10,7 +15,7 @@ if TYPE_CHECKING:
     from plox.interpreter import Interpreter
 
 
-class BuiltinPairMethod(LoxBindable):
+class BuiltinPairMethod(LoxBindableMethod):
     """Base class for pair methods"""
 
     pair: "LoxPair"
@@ -35,7 +40,7 @@ class CopyMethod(BuiltinPairMethod):
 class BuiltinPair(BuiltinClass):
     def __init__(self):
         name = Token(TokenType.IDENTIFIER, "pair", None, 0)
-        methods: dict[str, LoxBindable] = {
+        methods: dict[str, LoxBindableMethod] = {
             "copy": CopyMethod(),
         }
         super().__init__(name, methods, None)
