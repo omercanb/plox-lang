@@ -17,10 +17,10 @@ class BuiltinArrayMethod(LoxCallable):
 
 
 class AppendMethod(BuiltinArrayMethod):
-    def arity(self) -> int:
+    def arity(self):
         return 1
 
-    def call(self, interpreter: "Interpreter", arguments: List[Any]) -> Any:
+    def call(self, interpreter: "Interpreter", arguments: List[Any]):
         self.array.elements.append(arguments[0])
         return None
 
@@ -29,10 +29,10 @@ class AppendMethod(BuiltinArrayMethod):
 
 
 class PopMethod(BuiltinArrayMethod):
-    def arity(self) -> int:
+    def arity(self):
         return 0
 
-    def call(self, interpreter: "Interpreter", arguments: List[Any]) -> Any:
+    def call(self, interpreter: "Interpreter", arguments: List[Any]):
         if len(self.array.elements) == 0:
             raise RuntimeError(None, "Cannot pop from empty array.")
         return self.array.elements.pop()
@@ -42,10 +42,10 @@ class PopMethod(BuiltinArrayMethod):
 
 
 class LengthMethod(BuiltinArrayMethod):
-    def arity(self) -> int:
+    def arity(self):
         return 0
 
-    def call(self, interpreter: "Interpreter", arguments: List[Any]) -> Any:
+    def call(self, interpreter: "Interpreter", arguments: List[Any]):
         return len(self.array.elements)
 
     def __str__(self):
@@ -53,10 +53,10 @@ class LengthMethod(BuiltinArrayMethod):
 
 
 class ClearMethod(BuiltinArrayMethod):
-    def arity(self) -> int:
+    def arity(self):
         return 0
 
-    def call(self, interpreter: "Interpreter", arguments: List[Any]) -> Any:
+    def call(self, interpreter: "Interpreter", arguments: List[Any]):
         self.array.elements.clear()
         return None
 
@@ -65,25 +65,25 @@ class ClearMethod(BuiltinArrayMethod):
 
 
 class RemoveMethod(BuiltinArrayMethod):
-    def arity(self) -> int:
+    def arity(self):
         return 1
 
-    def call(self, interpreter: "Interpreter", arguments: List[Any]) -> Any:
+    def call(self, interpreter: "Interpreter", arguments: List[Any]):
         try:
             self.array.elements.remove(arguments[0])
-            return None
+            return True
         except ValueError:
-            raise RuntimeError(None, "Element not found in array.")
+            return False
 
     def __str__(self):
         return "<array method remove>"
 
 
 class InsertMethod(BuiltinArrayMethod):
-    def arity(self) -> int:
+    def arity(self):
         return 2
 
-    def call(self, interpreter: "Interpreter", arguments: List[Any]) -> Any:
+    def call(self, interpreter: "Interpreter", arguments: List[Any]):
         index, value = arguments
         idx = self.array._validate_index_type(index)
         self.array._check_insert_bounds(idx)
@@ -95,10 +95,10 @@ class InsertMethod(BuiltinArrayMethod):
 
 
 class IndexMethod(BuiltinArrayMethod):
-    def arity(self) -> int:
+    def arity(self):
         return 1
 
-    def call(self, interpreter: "Interpreter", arguments: List[Any]) -> Any:
+    def call(self, interpreter: "Interpreter", arguments: List[Any]):
         value = arguments[0]
         try:
             return self.array.elements.index(value)
@@ -110,10 +110,10 @@ class IndexMethod(BuiltinArrayMethod):
 
 
 class ReverseMethod(BuiltinArrayMethod):
-    def arity(self) -> int:
+    def arity(self):
         return 0
 
-    def call(self, interpreter: "Interpreter", arguments: List[Any]) -> Any:
+    def call(self, interpreter: "Interpreter", arguments: List[Any]):
         self.array.elements.reverse()
         return None
 
@@ -122,10 +122,10 @@ class ReverseMethod(BuiltinArrayMethod):
 
 
 class ContainsMethod(BuiltinArrayMethod):
-    def arity(self) -> int:
+    def arity(self):
         return 1
 
-    def call(self, interpreter: "Interpreter", arguments: List[Any]) -> Any:
+    def call(self, interpreter: "Interpreter", arguments: List[Any]):
         return arguments[0] in self.array.elements
 
     def __str__(self):
@@ -133,10 +133,10 @@ class ContainsMethod(BuiltinArrayMethod):
 
 
 class FirstMethod(BuiltinArrayMethod):
-    def arity(self) -> int:
+    def arity(self):
         return 0
 
-    def call(self, interpreter: "Interpreter", arguments: List[Any]) -> Any:
+    def call(self, interpreter: "Interpreter", arguments: List[Any]):
         if len(self.array.elements) == 0:
             raise RuntimeError(None, "Cannot get first element of empty array.")
         return self.array.elements[0]
@@ -146,10 +146,10 @@ class FirstMethod(BuiltinArrayMethod):
 
 
 class LastMethod(BuiltinArrayMethod):
-    def arity(self) -> int:
+    def arity(self):
         return 0
 
-    def call(self, interpreter: "Interpreter", arguments: List[Any]) -> Any:
+    def call(self, interpreter: "Interpreter", arguments: List[Any]):
         if len(self.array.elements) == 0:
             raise RuntimeError(None, "Cannot get last element of empty array.")
         return self.array.elements[-1]
@@ -159,10 +159,10 @@ class LastMethod(BuiltinArrayMethod):
 
 
 class RemoveAtMethod(BuiltinArrayMethod):
-    def arity(self) -> int:
+    def arity(self):
         return 1
 
-    def call(self, interpreter: "Interpreter", arguments: List[Any]) -> Any:
+    def call(self, interpreter: "Interpreter", arguments: List[Any]):
         index = arguments[0]
         idx = self.array._validate_index_type(index)
         self.array._check_read_bounds(idx)
@@ -170,6 +170,17 @@ class RemoveAtMethod(BuiltinArrayMethod):
 
     def __str__(self):
         return "<array method remove_at>"
+
+
+class CopyMethod(BuiltinArrayMethod):
+    def arity(self):
+        return 0
+
+    def call(self, interpreter: "Interpreter", arguments: List[Any]) -> "LoxArray":
+        return LoxArray(self.array.elements)
+
+    def __str__(self):
+        return "<array method copy>"
 
 
 class BuiltinArray(BuiltinClass):
@@ -184,16 +195,16 @@ class BuiltinArray(BuiltinClass):
         return 0
 
     def call(self, interpreter: "Interpreter", arguments: List[Any]) -> "LoxArray":
-        return LoxArray(self)
+        return LoxArray()
 
     def __str__(self):
         return "<builtin fn array>"
 
 
 class LoxArray(LoxInstance):
-    def __init__(self, cls: BuiltinArray):
-        self.cls = cls
-        self.elements: List[Any] = []
+    def __init__(self, elements: List[Any] = []):
+        self.cls = BuiltinArray()
+        self.elements: List[Any] = elements
 
     def is_truthy(self) -> bool:
         return len(self.elements) > 0
@@ -228,6 +239,7 @@ class LoxArray(LoxInstance):
             "first": FirstMethod,
             "last": LastMethod,
             "remove_at": RemoveAtMethod,
+            "copy": CopyMethod,
         }
         if name.lexeme in methods:
             return methods[name.lexeme](self)
@@ -249,3 +261,6 @@ class LoxArray(LoxInstance):
 
     def __repr__(self):
         return self.__str__()
+
+    def __eq__(self, other):
+        return self.elements == other.elements

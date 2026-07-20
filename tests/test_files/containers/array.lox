@@ -1,11 +1,11 @@
 var a = 3
-a[3]
 var arr = array()
 assert(arr.length() == 0)
 
 arr.append(10)
 arr.append(20)
 arr.append(30)
+print(arr)
 assert(arr.length() == 3)
 
 assert(arr[0] == 10)
@@ -45,3 +45,14 @@ assert(arr.length() == 1)
 
 arr.clear()
 assert(arr.length() == 0)
+
+var arr1 = array()
+arr1.append(1)
+arr1.append(2)
+arr1.append(3)
+
+var arr2 = array()
+arr2.append(1)
+arr2.append(2)
+arr2.append(3)
+assert(arr1 == arr2)
