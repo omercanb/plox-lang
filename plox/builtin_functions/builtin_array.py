@@ -4,6 +4,7 @@ from plox.builtin_functions.builtin_classes import BuiltinClass
 from plox.types.lox_callable import LoxCallable, LoxInstance
 from plox.types.lox_error import RuntimeError
 from plox.types.lox_token import Token
+from plox.types.token_type import TokenType
 
 if TYPE_CHECKING:
     from plox.interpreter import Interpreter
@@ -12,8 +13,12 @@ if TYPE_CHECKING:
 class BuiltinArrayMethod(LoxCallable):
     """Base class for array methods"""
 
-    def __init__(self, array: "LoxArray"):
-        self.array = array
+    array: "LoxArray"
+
+    def bind(self, array: "LoxArray"):
+        method = type(self)()
+        method.array = array
+        return method
 
 
 class AppendMethod(BuiltinArrayMethod):
@@ -185,14 +190,23 @@ class CopyMethod(BuiltinArrayMethod):
 
 class BuiltinArray(BuiltinClass):
     def __init__(self):
-        from plox.types.lox_token import Token
-        from plox.types.token_type import TokenType
-
         name = Token(TokenType.IDENTIFIER, "array", None, 0)
-        super().__init__(name, {}, None)
-
-    def arity(self) -> int:
-        return 0
+        methods = {
+            "append": AppendMethod(),
+            "pop": PopMethod(),
+            "length": LengthMethod(),
+            "clear": ClearMethod(),
+            "remove": RemoveMethod(),
+            "insert": InsertMethod(),
+            "index": IndexMethod(),
+            "reverse": ReverseMethod(),
+            "contains": ContainsMethod(),
+            "first": FirstMethod(),
+            "last": LastMethod(),
+            "remove_at": RemoveAtMethod(),
+            "copy": CopyMethod(),
+        }
+        super().__init__(name, methods, None)
 
     def call(self, interpreter: "Interpreter", arguments: List[Any]) -> "LoxArray":
         return LoxArray()
@@ -203,8 +217,8 @@ class BuiltinArray(BuiltinClass):
 
 class LoxArray(LoxInstance):
     def __init__(self, elements: List[Any] = []):
-        self.cls = BuiltinArray()
-        self.elements: List[Any] = elements
+        self.elements = list(elements) if elements else []
+        super().__init__(BuiltinArray())
 
     def is_truthy(self) -> bool:
         return len(self.elements) > 0
@@ -224,26 +238,6 @@ class LoxArray(LoxInstance):
         """Check if index is valid for inserting (0 <= index <= len)."""
         if index < 0 or index > len(self.elements):
             raise RuntimeError(None, f"Index {index} out of bounds.")
-
-    def get(self, name: Token) -> Any:
-        methods = {
-            "append": AppendMethod,
-            "pop": PopMethod,
-            "length": LengthMethod,
-            "clear": ClearMethod,
-            "remove": RemoveMethod,
-            "insert": InsertMethod,
-            "index": IndexMethod,
-            "reverse": ReverseMethod,
-            "contains": ContainsMethod,
-            "first": FirstMethod,
-            "last": LastMethod,
-            "remove_at": RemoveAtMethod,
-            "copy": CopyMethod,
-        }
-        if name.lexeme in methods:
-            return methods[name.lexeme](self)
-        raise RuntimeError(name, f"Array has no method '{name.lexeme}'.")
 
     def get_index(self, token: Token, index: Any) -> Any:
         idx = self._validate_index_type(index)

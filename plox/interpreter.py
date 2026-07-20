@@ -198,7 +198,10 @@ class Interpreter:
         callee: Any = self.evaluate(node.callee)
         arguments: List[Any] = [self.evaluate(arg) for arg in node.arguments]
         if not isinstance(callee, LoxCallable):
-            raise RuntimeError(node.callee, "Can only call functions and classes.")
+            raise RuntimeError(
+                node.callee,
+                f"Can only call functions and classes. Called on {type(callee)}",
+            )
         if len(arguments) != callee.arity():
             raise RuntimeError(
                 node.callee,

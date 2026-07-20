@@ -1,5 +1,6 @@
 var a = 3
 var arr = array()
+print(arr)
 assert(arr.length() == 0)
 
 arr.append(10)
@@ -56,3 +57,17 @@ arr2.append(1)
 arr2.append(2)
 arr2.append(3)
 assert(arr1 == arr2)
+
+var add = arr.append
+add(2)
+add(3)
+print(arr)
+var other_arr = array()
+print("arr " + arr)
+print("other " + other_arr)
+other_arr.appen = add
+other_arr.appen(10)
+print("arr " + arr)
+print("other should be empty" + other_arr)
+other_arr.append(1)
+print(other_arr)

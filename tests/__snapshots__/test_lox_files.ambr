@@ -1,6 +1,16 @@
 # serializer version: 1
 # name: test_lox_file[array.lox]
-  ''
+  '''
+  []
+  [10.0, 20.0, 30.0]
+  [2.0, 3.0]
+  arr [2.0, 3.0]
+  other []
+  arr [2.0, 3.0, 10.0]
+  other should be empty[]
+  [1.0]
+  
+  '''
 # ---
 # name: test_lox_file[bound_methods.lox]
   '''
