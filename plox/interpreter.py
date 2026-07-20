@@ -3,6 +3,8 @@ from typing import Any, Dict, List
 from plox.builtin_functions.builtin_array import BuiltinArray
 from plox.builtin_functions.builtin_assert import BuiltinAssert
 from plox.builtin_functions.builtin_clock import BuiltinClock
+from plox.builtin_functions.builtin_map import BuiltinMap
+from plox.builtin_functions.builtin_pair import BuiltinPair
 from plox.builtin_functions.builtin_print import BuiltinPrint
 from plox.types import environment, expr, stmt
 from plox.types.control_flow import BreakException, ContinueException, ReturnException
@@ -26,6 +28,8 @@ class Interpreter:
         self.globals.define("clock", BuiltinClock())
         self.globals.define("print", BuiltinPrint())
         self.globals.define("array", BuiltinArray())
+        self.globals.define("map", BuiltinMap())
+        self.globals.define("pair", BuiltinPair())
         self.globals.define("assert", BuiltinAssert())
         # A mapping of variables to how many scopes up the variable was defined
         self.locals: dict[Token, int] = locals

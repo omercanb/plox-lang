@@ -173,6 +173,18 @@
   
   '''
 # ---
+# name: test_lox_file[map.lox]
+  '''
+  Hello
+  World
+  nil
+  [Foo, 0.0, 1.0]
+  [Bar, [], (1.0, 2.0)]
+  [(Foo, Bar), (0.0, []), (1.0, (1.0, 2.0))]
+  {Foo: Bar, 0.0: [], 1.0: (1.0, 2.0)}
+  
+  '''
+# ---
 # name: test_lox_file[methods.lox]
   '''
   Crunch crunch crunch!
@@ -191,6 +203,15 @@
   700
   800
   900
+  
+  '''
+# ---
+# name: test_lox_file[pair.lox]
+  '''
+  (1.0, 2.0)
+  1
+  2
+  (10.0, 20.0)
   
   '''
 # ---

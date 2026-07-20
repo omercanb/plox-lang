@@ -1,0 +1,22 @@
+var m = map()
+m[0] = "Hello"
+m[1] = "World"
+print(m[0])
+print(m[1])
+print(m.get("Unkown Key"))
+assert(m.get(2) == nil)
+assert(m.contains(0))
+m.remove(1)
+assert(!m.contains(1))
+m.clear()
+assert(!m.contains(0))
+m["Foo"] = "Bar"
+m[0] = array()
+m[1] = pair(1, 2)
+print(m.keys())
+print(m.values())
+print(m.items())
+var m2 = m.copy()
+m.clear()
+assert(m2.contains("Foo"))
+print(m2)

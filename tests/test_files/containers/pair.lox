@@ -1,0 +1,13 @@
+var p = pair(1, 2)
+print(p)
+print(p.first)
+print(p.second)
+p.first = 10
+p.second = 20
+print(p)
+var p2 = p.copy()
+p2.first = 5
+assert(p != p2)
+p.first = 5
+assert(p == p2)
+

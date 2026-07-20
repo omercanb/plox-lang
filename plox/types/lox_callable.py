@@ -24,7 +24,11 @@ class LoxCallable(ABC):
         return "<callable>"
 
 
-class LoxFunction(LoxCallable):
+class LoxBindableMethod(LoxCallable):
+    def bind(self, instance: Any) -> "LoxBindableMethod": ...
+
+
+class LoxFunction(LoxBindableMethod):
     def __init__(
         self, declaration: "Function", closure: Environment, is_initializer
     ) -> None:
@@ -88,7 +92,7 @@ class LoxClass(LoxCallable):
     def __init__(
         self,
         name: Token,
-        methods: Dict[str, LoxFunction],
+        methods: Dict[str, LoxBindableMethod],
         superclass: Optional["LoxClass"],
     ):
         self.name = name
