@@ -10,7 +10,9 @@ class Counter {
     }
 
     increment(word) {
+        print(this.counts)
         this.check_word(word)
+        print(this.counts)
         this.counts[word] += 1
     }
 

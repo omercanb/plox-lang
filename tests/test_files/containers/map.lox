@@ -20,3 +20,8 @@ var m2 = m.copy()
 m.clear()
 assert(m2.contains("Foo"))
 print(m2)
+
+m[0] = 1
+m[0] += 1
+print(m)
+assert(m[0] == 2)

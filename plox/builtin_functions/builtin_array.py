@@ -204,6 +204,53 @@ class CopyMethod(BuiltinArrayMethod):
         return "<array method copy>"
 
 
+class SortMethod(BuiltinArrayMethod):
+    def arity(self):
+        return 0
+
+    def call(self, interpreter: "Interpreter", arguments: List[Any]):
+        from plox.builtin_functions.builtin_string import LoxString
+
+        def sort_key(elem):
+            if isinstance(elem, LoxString):
+                return elem.value
+            return elem
+
+        try:
+            self.array.elements.sort(key=sort_key)
+        except TypeError:
+            raise RuntimeError(None, "Cannot sort array with incompatible types.")
+        return None
+
+    def __str__(self):
+        return "<array method sort>"
+
+
+class SortKeyMethod(BuiltinArrayMethod):
+    def arity(self):
+        return 1
+
+    def call(self, interpreter: "Interpreter", arguments: List[Any]):
+        from plox.types.lox_callable import LoxCallable
+
+        key_fn = arguments[0]
+        if not isinstance(key_fn, LoxCallable):
+            raise RuntimeError(None, "sort_key() requires a callable argument.")
+
+        def sort_key(elem):
+            result = key_fn.call(interpreter, [elem])
+            return result
+
+        try:
+            self.array.elements.sort(key=sort_key)
+        except TypeError:
+            raise RuntimeError(None, "Key function must return comparable values.")
+        return None
+
+    def __str__(self):
+        return "<array method sort_key>"
+
+
 class BuiltinArray(BuiltinClass):
     def __init__(self):
         name = Token(TokenType.IDENTIFIER, "array", None, 0)
@@ -222,6 +269,8 @@ class BuiltinArray(BuiltinClass):
             "remove_at": RemoveAtMethod(),
             "slice": SliceMethod(),
             "copy": CopyMethod(),
+            "sort": SortMethod(),
+            "sort_key": SortKeyMethod(),
         }
         super().__init__(name, methods, None)
 

@@ -14,7 +14,7 @@ class BuiltinArgv(LoxCallable):
         return 0
 
     def call(self, interpreter: "Interpreter", arguments: List[Any]) -> LoxArray:
-        return LoxArray([LoxString(arg) for arg in sys.argv])
+        return LoxArray([LoxString(arg) for arg in sys.argv[1:]])
 
     def __str__(self) -> str:
         return "<builtin argv>"

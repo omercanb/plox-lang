@@ -227,14 +227,19 @@ class Parser:
         if self.match(*COMPOUND_ASSIGN):
             op_token = self.previous()
             base_type = COMPOUND_ASSIGN[op_token.token_type]
+            base_op = Token(base_type, op_token.lexeme[0], None, op_token.line)
+
             value = self.assignment()
+            new_value = exprs.Binary(expr, base_op, value)
+
             if isinstance(expr, exprs.Variable):
-                base_op = Token(base_type, op_token.lexeme[0], None, op_token.line)
-                return exprs.Assign(expr.name, exprs.Binary(expr, base_op, value))
+                return exprs.Assign(expr.name, new_value)
             elif isinstance(expr, exprs.Get):
-                return exprs.Set(expr.object, expr.name, value)
+                return exprs.Set(expr.object, expr.name, new_value)
             elif isinstance(expr, exprs.Index):
-                return exprs.IndexAssign(expr.object, expr.bracket, expr.index, value)
+                return exprs.IndexAssign(
+                    expr.object, expr.bracket, expr.index, new_value
+                )
             self.error(op_token, "Invalid assignment target.")
 
         if self.match(TokenType.EQUAL):

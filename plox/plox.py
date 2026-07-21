@@ -31,7 +31,7 @@ def main():
         print_lex = True
         sys.argv.remove("--print-lex")
 
-    if len(sys.argv) == 2:
+    if len(sys.argv) >= 2:
         run_file(sys.argv[1])
     else:
         print("Usage: lox [script] [--print]")
