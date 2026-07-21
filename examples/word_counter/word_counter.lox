@@ -1,8 +1,15 @@
+// Example program that reads file names from the command line
+// Counts word frequencies in the file
+// and prints the top 5 most common words for each file and in total
+
+// A class definition
 class Counter {
+    // Defining constructors
     init() {
         this.counts = map()
     }
 
+    // Methods using 'this'
     check_word(word) {
         if (!this.counts.contains(word)) {
             this.counts[word] = 0
@@ -20,6 +27,7 @@ class Counter {
     }
 
     print() {
+        // Items is an array of pairs
         var items = this.counts.items()
         for (var i = 0; i < items.length(); i += 1) {
             var word = items[i].first
@@ -84,6 +92,8 @@ fun main() {
         print("usage: plox word_counter.lox <file>...")
         return
     }
+
+    // Parse files
     var files = args.slice(1, args.length())
     print("Files")
     print(files)
@@ -91,6 +101,7 @@ fun main() {
 
     var k = 5
 
+    // Loop through files and count
     var total_counter = Counter()
     var counters = map()
     for (var i = 0; i < files.length(); i += 1) {
@@ -99,10 +110,10 @@ fun main() {
         counters[file] = counter
         merge_counters(total_counter, counter)
     }
+
     total_counter = top_k_counts(total_counter, k)
     print("Total Counts")
     total_counter.print()
-    top_k_counts(total_counter, k)
     print("")
 
     print("Per File Counts")
@@ -111,6 +122,7 @@ fun main() {
         var path = items[i].first
         var counter = items[i].second
         counter = top_k_counts(counter, k)
+
         print("File: " + path)
         counter.print()
         print("")
