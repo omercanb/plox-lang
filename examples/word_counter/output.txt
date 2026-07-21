@@ -1,0 +1,25 @@
+Files
+["input1.txt", "input2.txt"]
+
+Total Counts
+c 170
+a 133
+l 113
+d 99
+b 99
+
+Per File Counts
+File: input1.txt
+c 60
+a 48
+l 38
+d 34
+b 34
+
+File: input2.txt
+c 110
+a 85
+l 75
+b 65
+d 65
+
