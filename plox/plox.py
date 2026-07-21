@@ -19,10 +19,6 @@ def main():
     global print_tree
     global print_lex
 
-    if len(sys.argv) > 3:
-        print("Usage: lox [script] [--print]")
-        sys.exit(64)
-
     if "--print" in sys.argv:
         print_tree = True
         sys.argv.remove("--print")

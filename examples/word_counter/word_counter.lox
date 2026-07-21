@@ -10,15 +10,22 @@ class Counter {
     }
 
     increment(word) {
-        print(this.counts)
         this.check_word(word)
-        print(this.counts)
         this.counts[word] += 1
     }
 
     add(word, count) {
         this.check_word(word)
         this.counts[word] += count
+    }
+
+    print() {
+        var items = this.counts.items()
+        for (var i = 0; i < items.length(); i += 1) {
+            var word = items[i].first
+            var count = items[i].second
+            print(word + " " + count)
+        }
     }
 
 
@@ -37,6 +44,10 @@ fun merge_counters(source, other) {
 fun count_line(counter, line) {
     var words = line.split(" ")
     for (var i = 0; i < words.length(); i += 1) {
+        // Skip empty strings
+        if (!words[i]) {
+            continue;
+        }
         counter.increment(words[i])
     }
 }
@@ -61,6 +72,8 @@ fun main() {
     var files = args.slice(1, args.length())
     print("Files")
     print(files)
+    print("")
+
     var total_counter = Counter()
     var counters = map()
     for (var i = 0; i < files.length(); i += 1) {
@@ -69,7 +82,20 @@ fun main() {
         counters[file] = counter
         merge_counters(total_counter, counter)
     }
-    print(total_counter)
+    print("Total Counts")
+    total_counter.print()
+    print("")
+
+
+    print("Per File Counts")
+    var items = counters.items()
+    for (var i = 0; i < items.length(); i += 1) {
+        var path = items[i].first
+        var counter = items[i].second
+        print("File: " + path)
+        counter.print()
+        print("")
+    }
 }
 
 main()
