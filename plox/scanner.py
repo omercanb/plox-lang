@@ -139,7 +139,11 @@ class Scanner:
             self.advance()
             while self.peek().isdigit():
                 self.advance()
-        value = float(self.source[self.start : self.current])
+        num_str = self.source[self.start : self.current]
+        if num_str.count("."):
+            value = float(num_str)
+        else:
+            value = int(num_str)
         self.add_token(TokenType.NUMBER, value)
 
     def string(self) -> None:
