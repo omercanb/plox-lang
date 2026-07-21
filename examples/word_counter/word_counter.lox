@@ -62,6 +62,21 @@ fun get_counter_for_file(path) {
     return counter
 }
 
+// Return a counter that contains only the top k counts
+fun top_k_counts(counter, k) {
+    var items = counter.counts.items()
+    items.sort_key(fun(x) {x.second})
+    items.reverse()
+    var selected_items = items.slice(0, k)
+    var top_counter = Counter()
+    for (var i = 0; i < k; i += 1) {
+        var word = selected_items[i].first
+        var count = selected_items[i].second
+        top_counter.add(word, count)
+    }
+    return top_counter
+}
+
 
 fun main() {
     var args = argv()
@@ -74,6 +89,8 @@ fun main() {
     print(files)
     print("")
 
+    var k = 5
+
     var total_counter = Counter()
     var counters = map()
     for (var i = 0; i < files.length(); i += 1) {
@@ -82,16 +99,18 @@ fun main() {
         counters[file] = counter
         merge_counters(total_counter, counter)
     }
+    total_counter = top_k_counts(total_counter, k)
     print("Total Counts")
     total_counter.print()
+    top_k_counts(total_counter, k)
     print("")
-
 
     print("Per File Counts")
     var items = counters.items()
     for (var i = 0; i < items.length(); i += 1) {
         var path = items[i].first
         var counter = items[i].second
+        counter = top_k_counts(counter, k)
         print("File: " + path)
         counter.print()
         print("")
