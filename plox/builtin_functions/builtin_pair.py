@@ -76,6 +76,10 @@ class LoxPair(LoxInstance):
     def __repr__(self):
         return self.__str__()
 
+    def __hash__(self):
+        pair = (self.first, self.second)
+        return hash(pair)
+
     def __eq__(self, other):
         return (
             isinstance(other, LoxPair)

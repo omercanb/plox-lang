@@ -1,0 +1,60 @@
+class Counter {
+    init() {
+        this.counts = map()
+    }
+
+    check_word(word) {
+        if (!this.counts.contains(word)) {
+            this.counts[word] = 0
+        }
+    }
+
+    count(word) {
+        this.check_word(word)
+        this.counts[word] += 1
+    }
+
+    increment(word, count) {
+        this.check_word(word)
+        this.counts[word] += count
+    }
+
+
+}
+// Merge two counters
+fun merge_counters(source, other) {
+    var items = other.counts.items()
+    for (var i = 0; i < items.length(); i += 1) {
+        var word = items[i].first
+        var count = items[i].second
+        source.increment(word, count)
+    }
+}
+
+// Split a line by whitespaces into an array of words
+fun get_words_in_line(line) {
+    return array()
+}
+
+fun get_words_in_file(path) {
+    var counter = map()
+    var lines = readlines(path)
+    for (var i = 0; i < lines.length(); i += 1) {
+        var words = get_words_in_line(lines[i])
+    }
+}
+
+
+fun count_words_in_file(path) {
+    counter = map()
+}
+
+fun main() {
+    var args = argv()
+    if (args.length() <= 1) {
+        print("usage: plox word_counter.lox <file>...")
+        return
+    }
+}
+
+main()

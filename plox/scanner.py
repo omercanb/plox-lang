@@ -1,5 +1,6 @@
 from typing import Any, Dict, List
 
+from plox.builtin_functions.builtin_string import LoxString
 from plox.semicolon_inference import SemicolonInference
 from plox.types.lox_token import Token
 from plox.types.token_type import TokenType
@@ -154,7 +155,7 @@ class Scanner:
         self.advance()
         value = self.source[self.start + 1 : self.current - 1]
         value = eval(f'"{value}"')
-        self.add_token(TokenType.STRING, value)
+        self.add_token(TokenType.STRING, LoxString(value))
 
     def match(self, expected: str) -> bool:
         if self.is_at_end():

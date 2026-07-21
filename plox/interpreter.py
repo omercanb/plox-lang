@@ -9,6 +9,7 @@ from plox.builtin_functions.builtin_pair import BuiltinPair
 from plox.builtin_functions.builtin_print import BuiltinPrint
 from plox.builtin_functions.builtin_read import BuiltinRead, BuiltinReadLines
 from plox.builtin_functions.builtin_set import BuiltinSet
+from plox.builtin_functions.builtin_string import LoxString
 from plox.types import environment, expr, stmt
 from plox.types.control_flow import BreakException, ContinueException, ReturnException
 from plox.types.environment import Environment
@@ -138,7 +139,7 @@ class Interpreter:
         elif token_type == TokenType.PLUS:
             if isinstance(left, (int, float)) and isinstance(right, (int, float)):
                 return left + right
-            if isinstance(left, str) or isinstance(right, str):
+            if isinstance(left, LoxString) or isinstance(right, LoxString):
                 return self.stringify(left) + self.stringify(right)
             raise RuntimeError(node.op, "Operands must be two numbers or two strings.")
         elif token_type == TokenType.SLASH:
@@ -369,14 +370,14 @@ class Interpreter:
             return
         raise RuntimeError(op, "Operands must be numbers.")
 
-    def stringify(self, value: Any) -> str:
+    def stringify(self, value: Any) -> LoxString:
         if value is None:
-            return "nil"
+            return LoxString("nil")
         if isinstance(value, bool):
-            return "true" if value else "false"
+            return LoxString("true") if value else LoxString("false")
         if isinstance(value, float):
             text = str(value)
             if text.endswith(".0"):
-                return text[:-2]
-            return text
-        return str(value)
+                return LoxString(text[:-2])
+            return LoxString(text)
+        return LoxString(value)
