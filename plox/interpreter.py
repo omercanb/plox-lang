@@ -1,5 +1,6 @@
 from typing import Any, Dict, List
 
+from plox.builtin_functions.builtin_argv import BuiltinArgv
 from plox.builtin_functions.builtin_array import BuiltinArray
 from plox.builtin_functions.builtin_assert import BuiltinAssert
 from plox.builtin_functions.builtin_clock import BuiltinClock
@@ -36,6 +37,7 @@ class Interpreter:
         self.globals.define("assert", BuiltinAssert())
         self.globals.define("read", BuiltinRead())
         self.globals.define("readlines", BuiltinReadLines())
+        self.globals.define("argv", BuiltinArgv())
         # A mapping of variables to how many scopes up the variable was defined
         self.locals: dict[Token, int] = locals
 

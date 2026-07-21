@@ -1,4 +1,4 @@
-from typing import Any, List, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, List
 
 from plox.types.lox_callable import LoxCallable
 
