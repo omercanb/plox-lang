@@ -2,6 +2,8 @@ from typing import TYPE_CHECKING, Any, Iterable, List, Set
 
 from plox.builtin_functions.builtin_array import LoxArray
 from plox.builtin_functions.builtin_classes import BuiltinClass
+from plox.builtin_functions.builtin_pair import LoxPair
+from plox.builtin_functions.builtin_string import LoxString
 from plox.types.lox_callable import LoxBindableMethod, LoxInstance
 from plox.types.lox_error import RuntimeError
 from plox.types.lox_token import Token
@@ -221,7 +223,9 @@ class LoxSet(LoxInstance):
 
     def _validate_element_type(self, element: Any) -> Any:
         """Only hashable primitives may be elements. Instances and arrays may not."""
-        if element is None or isinstance(element, (bool, int, float, str)):
+        if element is None or isinstance(
+            element, (bool, int, float, LoxString, LoxPair)
+        ):
             return element
         raise RuntimeError(
             None, "Set elements must be a number, string, boolean, or nil."
