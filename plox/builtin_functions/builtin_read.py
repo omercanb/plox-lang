@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING, Any, List
 
 from plox.builtin_functions.builtin_array import LoxArray
+from plox.builtin_functions.builtin_string import LoxString
 from plox.types.lox_callable import LoxCallable
 from plox.types.lox_error import RuntimeError
 
@@ -12,10 +13,10 @@ class BuiltinRead(LoxCallable):
     def arity(self) -> int:
         return 1
 
-    def call(self, interpreter: "Interpreter", arguments: List[Any]) -> str:
-        path = arguments[0]
+    def call(self, interpreter: "Interpreter", arguments: List[Any]) -> LoxString:
+        path = arguments[0].value
         try:
-            return open(path).read()
+            return LoxString(open(path).read())
         except Exception as e:
             print(e)
             raise RuntimeError(None, f"File '{path}' can't be opened")
@@ -29,9 +30,11 @@ class BuiltinReadLines(LoxCallable):
         return 1
 
     def call(self, interpreter: "Interpreter", arguments: List[Any]) -> LoxArray:
-        path = arguments[0]
+        path = arguments[0].value
         try:
-            return LoxArray(open(path).read().splitlines())
+            return LoxArray(
+                [LoxString(line) for line in open(path).read().splitlines()]
+            )
         except Exception:
             raise RuntimeError(None, f"File '{path}' can't be opened")
 

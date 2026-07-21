@@ -9,12 +9,12 @@ class Counter {
         }
     }
 
-    count(word) {
+    increment(word) {
         this.check_word(word)
         this.counts[word] += 1
     }
 
-    increment(word, count) {
+    add(word, count) {
         this.check_word(word)
         this.counts[word] += count
     }
@@ -27,36 +27,47 @@ fun merge_counters(source, other) {
     for (var i = 0; i < items.length(); i += 1) {
         var word = items[i].first
         var count = items[i].second
-        source.increment(word, count)
+        source.add(word, count)
     }
 }
 
 // Split a line by whitespaces into an array of words
-fun get_words_in_line(line) {
-    return array()
-}
-
-fun get_words_in_file(path) {
-    var counter = map()
-    var lines = readlines(path)
-    for (var i = 0; i < lines.length(); i += 1) {
-        var words = get_words_in_line(lines[i])
+fun count_line(counter, line) {
+    var words = line.split(" ")
+    for (var i = 0; i < words.length(); i += 1) {
+        counter.increment(words[i])
     }
 }
 
-
-fun count_words_in_file(path) {
-    counter = map()
+fun get_counter_for_file(path) {
+    var counter = Counter()
+    var lines = readlines(path)
+    for (var i = 0; i < lines.length(); i += 1) {
+        var line = lines[i]
+        count_line(counter, line)
+    }
+    return counter
 }
+
 
 fun main() {
     var args = argv()
-    print(args)
-    print(args.length())
     if (args.length() <= 1) {
         print("usage: plox word_counter.lox <file>...")
         return
     }
+    var files = args.slice(1, args.length())
+    print("Files")
+    print(files)
+    var total_counter = Counter()
+    var counters = map()
+    for (var i = 0; i < files.length(); i += 1) {
+        var file = files[i]
+        var counter = get_counter_for_file(file)
+        counters[file] = counter
+        merge_counters(total_counter, counter)
+    }
+    print(total_counter)
 }
 
 main()

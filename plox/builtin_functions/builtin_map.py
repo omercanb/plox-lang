@@ -2,7 +2,8 @@ from typing import TYPE_CHECKING, Any, Dict, List
 
 from plox.builtin_functions.builtin_array import LoxArray
 from plox.builtin_functions.builtin_classes import BuiltinClass
-from plox.builtin_functions.builtin_pair import LoxPair
+from plox.builtin_functions.builtin_pair import BuiltinPair, LoxPair
+from plox.builtin_functions.builtin_string import LoxString
 from plox.types.lox_callable import LoxBindableMethod, LoxCallable, LoxInstance
 from plox.types.lox_error import RuntimeError
 from plox.types.lox_token import Token
@@ -161,7 +162,7 @@ class LoxMap(LoxInstance):
 
     def _validate_key_type(self, key: Any) -> Any:
         """Only hashable primitives may be keys. Instances and arrays may not."""
-        if key is None or isinstance(key, (bool, int, float, str)):
+        if key is None or isinstance(key, (bool, int, float, BuiltinPair, LoxString)):
             return key
         raise RuntimeError(None, "Map keys must be a number, string, boolean, or nil.")
 

@@ -143,4 +143,4 @@ class LoxInstance:
         self.fields[name.lexeme] = value
 
     def __str__(self):
-        return f"<instance {self.cls.name.lexeme}>"
+        return f"<instance {self.cls.name.lexeme} fields: {self.fields}>"

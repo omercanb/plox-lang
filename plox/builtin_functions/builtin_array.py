@@ -177,6 +177,22 @@ class RemoveAtMethod(BuiltinArrayMethod):
         return "<array method remove_at>"
 
 
+class SliceMethod(BuiltinArrayMethod):
+    def arity(self):
+        return 2
+
+    def call(self, interpreter: "Interpreter", arguments: List[Any]):
+        begin, end = arguments
+        begin = self.array._validate_index_type(begin)
+        end = self.array._validate_index_type(end)
+        self.array._check_read_bounds(begin)
+        self.array._check_insert_bounds(end)
+        return LoxArray(self.array.elements[begin:end])
+
+    def __str__(self):
+        return "<array method slice>"
+
+
 class CopyMethod(BuiltinArrayMethod):
     def arity(self):
         return 0
@@ -204,6 +220,7 @@ class BuiltinArray(BuiltinClass):
             "first": FirstMethod(),
             "last": LastMethod(),
             "remove_at": RemoveAtMethod(),
+            "slice": SliceMethod(),
             "copy": CopyMethod(),
         }
         super().__init__(name, methods, None)

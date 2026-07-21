@@ -63,16 +63,43 @@ class StripMethod(BuiltinStringMethod):
 
 class SplitMethod(BuiltinStringMethod):
     def arity(self) -> int:
-        return 0
+        return 1
 
     def call(self, interpreter: "Interpreter", arguments: List[Any]) -> Any:
         from plox.builtin_functions.builtin_array import LoxArray
 
-        parts = self.string.value.split()
+        delimiter = arguments[0]
+        if isinstance(delimiter, LoxString):
+            delimiter = delimiter.value
+        else:
+            delimiter = interpreter.stringify(delimiter).value
+        parts = self.string.value.split(delimiter)
         return LoxArray([LoxString(p) for p in parts])
 
     def __str__(self):
         return "<string method split>"
+
+
+class JoinMethod(BuiltinStringMethod):
+    def arity(self) -> int:
+        return 1
+
+    def call(self, interpreter: "Interpreter", arguments: List[Any]) -> "LoxString":
+        from plox.builtin_functions.builtin_array import LoxArray
+
+        array = arguments[0]
+        if isinstance(array, LoxArray):
+            parts = []
+            for elem in array.elements:
+                if isinstance(elem, LoxString):
+                    parts.append(elem.value)
+                else:
+                    parts.append(str(elem))
+            return LoxString(self.string.value.join(parts))
+        raise RuntimeError(None, "join() requires an array argument.")
+
+    def __str__(self):
+        return "<string method join>"
 
 
 class ReplaceMethod(BuiltinStringMethod):
@@ -210,6 +237,7 @@ class LoxString(LoxInstance):
             "lower": LowerMethod(self),
             "strip": StripMethod(self),
             "split": SplitMethod(self),
+            "join": JoinMethod(self),
             "replace": ReplaceMethod(self),
             "startswith": StartsWithMethod(self),
             "endswith": EndsWithMethod(self),
