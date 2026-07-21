@@ -157,16 +157,6 @@
   
   '''
 # ---
-# name: test_lox_file[line_break.lox]
-  '''
-  [line 3] Error: Expect expression.
-  [line 4] Error: Expect newline after expression.
-  [line 9] Error: Expect ')' after arguments.
-  [line 10] Error: Expect expression.
-  [line 11] Error: Expect newline after expression.
-  
-  '''
-# ---
 # name: test_lox_file[logical.lox]
   '''
   hello world
@@ -235,6 +225,23 @@
   10
   20
   30
+  
+  '''
+# ---
+# name: test_lox_file[read.lox]
+  '''
+  print(1 + 3);
+  print("seventy");
+  print(true);
+  print(nil);
+  print(127358912375981235791751329);
+  print(109581230958123095812305 * 129058510298521091583);
+  print(0235981230958120935 + " " + 1509821305892130985);
+  print(0159238512309.18235901283501923);
+  print(1203981203958.182359081203 + 10239812539.1235091283509 + " " + 02358123095.1230598123950);
+  print("hello")
+  
+  [print(1 + 3);, print("seventy");, print(true);, print(nil);, print(127358912375981235791751329);, print(109581230958123095812305 * 129058510298521091583);, print(0235981230958120935 + " " + 1509821305892130985);, print(0159238512309.18235901283501923);, print(1203981203958.182359081203 + 10239812539.1235091283509 + " " + 02358123095.1230598123950);, print("hello")]
   
   '''
 # ---

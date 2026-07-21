@@ -6,6 +6,7 @@ from plox.builtin_functions.builtin_clock import BuiltinClock
 from plox.builtin_functions.builtin_map import BuiltinMap
 from plox.builtin_functions.builtin_pair import BuiltinPair
 from plox.builtin_functions.builtin_print import BuiltinPrint
+from plox.builtin_functions.builtin_read import BuiltinRead, BuiltinReadLines
 from plox.builtin_functions.builtin_set import BuiltinSet
 from plox.types import environment, expr, stmt
 from plox.types.control_flow import BreakException, ContinueException, ReturnException
@@ -33,6 +34,8 @@ class Interpreter:
         self.globals.define("pair", BuiltinPair())
         self.globals.define("set", BuiltinSet())
         self.globals.define("assert", BuiltinAssert())
+        self.globals.define("read", BuiltinRead())
+        self.globals.define("readlines", BuiltinReadLines())
         # A mapping of variables to how many scopes up the variable was defined
         self.locals: dict[Token, int] = locals
 

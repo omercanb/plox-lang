@@ -34,7 +34,7 @@ def main():
     if len(sys.argv) == 2:
         run_file(sys.argv[1])
     else:
-        run_prompt()
+        print("Usage: lox [script] [--print]")
 
 
 def run_file(path: str) -> None:
@@ -46,20 +46,6 @@ def run_file(path: str) -> None:
         sys.exit(65)
     if had_runtime_error:
         sys.exit(70)
-
-
-def run_prompt() -> None:
-    global had_error
-    while True:
-        try:
-            print("> ", end="", flush=True)
-            line = input()
-            if not line:
-                break
-            run(line)
-            had_error = False
-        except EOFError:
-            break
 
 
 def run(source: str) -> None:

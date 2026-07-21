@@ -1,0 +1,3 @@
+var path = "test_files/io/print.lox"
+print(read(path))
+print(readlines(path))
