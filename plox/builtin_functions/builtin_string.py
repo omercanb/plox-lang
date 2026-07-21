@@ -221,7 +221,7 @@ class LoxString(LoxInstance):
         raise RuntimeError(name, f"String has no method '{name.lexeme}'.")
 
     def __str__(self):
-        return self.value
+        return f'"{self.value}"'
 
     def __repr__(self):
         return f'"{self.value}"'

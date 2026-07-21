@@ -11,7 +11,7 @@ class BuiltinPrint(LoxCallable):
         return 1
 
     def call(self, interpreter: "Interpreter", arguments: List[Any]) -> None:
-        print(interpreter.stringify(arguments[0]))
+        print(interpreter.stringify(arguments[0]).value)
         return None
 
     def __str__(self) -> str:

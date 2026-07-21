@@ -224,13 +224,19 @@ class Interpreter:
     def visit_Get(self, node: expr.Get):
         object = self.evaluate(node.object)
         if not isinstance(object, LoxInstance):
-            raise RuntimeError(node.name, "Only instances have properties.")
+            raise RuntimeError(
+                node.name,
+                f"Only instances have properties. Object is a {type(object)}.",
+            )
         return object.get(node.name)
 
     def visit_Set(self, node: expr.Set):
         object = self.evaluate(node.object)
         if not isinstance(object, LoxInstance):
-            raise RuntimeError(node.name, "Only instances have properties.")
+            raise RuntimeError(
+                node.name,
+                f"Only instances have properties. Object is a {type(object)}.",
+            )
         value = self.evaluate(node.value)
         object.set(node.name, value)
         return value
@@ -380,4 +386,6 @@ class Interpreter:
             if text.endswith(".0"):
                 return LoxString(text[:-2])
             return LoxString(text)
+        if isinstance(value, LoxString):
+            return value
         return LoxString(value)

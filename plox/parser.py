@@ -231,6 +231,10 @@ class Parser:
             if isinstance(expr, exprs.Variable):
                 base_op = Token(base_type, op_token.lexeme[0], None, op_token.line)
                 return exprs.Assign(expr.name, exprs.Binary(expr, base_op, value))
+            elif isinstance(expr, exprs.Get):
+                return exprs.Set(expr.object, expr.name, value)
+            elif isinstance(expr, exprs.Index):
+                return exprs.IndexAssign(expr.object, expr.bracket, expr.index, value)
             self.error(op_token, "Invalid assignment target.")
 
         if self.match(TokenType.EQUAL):
